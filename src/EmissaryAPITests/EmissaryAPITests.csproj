@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EmissaryAPI\EmissaryAPI.csproj" />
+    <ProjectReference Include="..\EmissaryApi\EmissaryApi.csproj" />
   </ItemGroup>
 
 </Project>

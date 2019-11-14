@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryBot", "EmissaryBot\EmissaryBot.csproj", "{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryAPI", "EmissaryAPI\EmissaryAPI.csproj", "{172978DE-6138-40BF-A992-6DDD83211DB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApi", "EmissaryApi\EmissaryApi.csproj", "{172978DE-6138-40BF-A992-6DDD83211DB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryAPITests", "EmissaryAPITests\EmissaryAPITests.csproj", "{BB1AE190-8B73-480A-9893-ED7F80A8288C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApiTests", "EmissaryApiTests\EmissaryApiTests.csproj", "{BB1AE190-8B73-480A-9893-ED7F80A8288C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryBotTests", "EmissaryBotTests\EmissaryBotTests.csproj", "{C7F63604-AC83-4277-95E5-3749A2B53417}"
 EndProject

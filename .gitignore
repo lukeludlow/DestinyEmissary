@@ -1,3 +1,6 @@
+# secrets (api keys, etc.)
+secrets.json
+appsettings.json
 
 # Created by https://www.gitignore.io/api/csharp,dotnetcore
 # Edit at https://www.gitignore.io/?templates=csharp,dotnetcore
