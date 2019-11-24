@@ -16,6 +16,8 @@
     "csharp.format.enable": true,
     "editor.formatOnSave": true,
     "coverage-gutters.coverageReportFileName": "**/lcov.info",
-    "omnisharp.useEditorFormattingSettings": false
+		"omnisharp.useEditorFormattingSettings": false,
+		"editor.wordWrap": "wordWrapColumn",
+		"editor.wordWrapColumn": 120
   }
 }

@@ -11,9 +11,11 @@ namespace EmissaryApiTests
         [TestMethod]
         public void TestMethod1()
         {
-            string sss = DummyGetManifestInventoryItem();
-            Assert.AreEqual("Gjallarhorn", sss);
+            Abc();
             Assert.Fail();
+            // string sss = DummyGetManifestInventoryItem();
+            // Assert.AreEqual("Gjallarhorn", sss);
+            // Assert.Fail();
         }
     }
 }

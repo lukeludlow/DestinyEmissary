@@ -36,11 +36,26 @@ namespace EmissaryApi
                 var response = client.GetAsync("https://www.bungie.net/platform/Destiny/Manifest/InventoryItem/1274330687/").Result;
                 var content = response.Content.ReadAsStringAsync().Result;
                 dynamic item = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+                Console.WriteLine($"full message: {item}");
                 string itemName = item.Response.data.inventoryItem.itemName;
                 Console.WriteLine($"found item name: {itemName}");
                 return itemName;
             }
         }
+
+        public static void Abc()
+        {
+            using (var client = new HttpClient()) {
+                string requestUrl = "https://www.bungie.net/platform/Destiny2/SearchDestinyPlayer/TigerSteam/pimpdaddy/";
+                client.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
+                HttpResponseMessage response = client.GetAsync(requestUrl).Result;
+                string responseContentString = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(responseContentString);
+            }
+        }
+
+        public 
+
 
     }
 }
