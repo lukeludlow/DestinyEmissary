@@ -1,5 +1,5 @@
 
-namespace EmissaryApi
+namespace EmissaryApi.Model
 {
     /// <summary>
     /// Represents the possible components that can be returned from Destiny "Get" calls such as GetProfile,
