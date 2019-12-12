@@ -18,6 +18,7 @@
     "coverage-gutters.coverageReportFileName": "**/lcov.info",
 		"omnisharp.useEditorFormattingSettings": false,
 		"editor.wordWrap": "wordWrapColumn",
-		"editor.wordWrapColumn": 120
+		"editor.wordWrapColumn": 120,
+		"editor.wrappingIndent": "deepIndent"
   }
 }
