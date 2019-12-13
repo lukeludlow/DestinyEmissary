@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Net.Http;
-using System.IO;  // Directory
-using System.Reflection;  // Assembly
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using EmissaryApi.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,30 +9,23 @@ namespace EmissaryApi
     public class Emissary
     {
 
-        private HttpClient httpClient;
+        private BungieApiProxy bungieApiProxy;
 
         public Emissary()
         {
-            this.httpClient = new HttpClient();
-            this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
+            this.bungieApiProxy = new BungieApiProxy();
         }
 
-        // constructor used for dependency injection stuff
-        public Emissary(HttpClient httpClient)
+        internal Emissary(BungieApiProxy bungieApiProxy)
         {
-            this.httpClient = httpClient;
+            this.bungieApiProxy = bungieApiProxy;
         }
 
-        // public DestinyProfileResponse CurrentlyEquipped(long membershipId)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         public long GetMostRecentlyPlayedCharacter(long membershipId)
         {
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=200";
-            HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
-            string json = httpResponse.Content.ReadAsStringAsync().Result;
+            string json = bungieApiProxy.SendRequest(requestUrl);
             DestinyProfileCharactersResponse response = JsonConvert.DeserializeObject<DestinyProfileCharactersResponse>(json);
             List<DestinyCharacterComponent> characters = response.Response.Characters.Data.Values.ToList();
             DestinyCharacterComponent mostRecentlyPlayedCharacter = characters[0];
@@ -52,8 +40,7 @@ namespace EmissaryApi
         public List<UInt32> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
         {        
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
-            HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
-            string json = httpResponse.Content.ReadAsStringAsync().Result;
+            string json = bungieApiProxy.SendRequest(requestUrl);
             DestinyProfileCharacterEquipmentResponse response = JsonConvert.DeserializeObject<DestinyProfileCharacterEquipmentResponse>(json);
             DestinyInventoryComponent characterInventory = response.Response.CharacterEquipment.Data[characterId];
             List<UInt32> itemHashes = new List<UInt32>();
@@ -74,25 +61,11 @@ namespace EmissaryApi
         }
 
 
-        public string DummyGetManifestInventoryItem()
-        {
-            // this is a blocking statement
-            var response = httpClient.GetAsync("https://www.bungie.net/platform/Destiny/Manifest/InventoryItem/1274330687/").Result;
-            var content = response.Content.ReadAsStringAsync().Result;
-            dynamic item = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
-            //Console.WriteLine($"full message: {item}");
-            string itemName = item.Response.data.inventoryItem.itemName;
-            Console.WriteLine($"found item name: {itemName}");
-            return itemName;
-        }
-
         public bool TrySearchDestinyPlayer(string displayName, out long membershipId)
         {
             int membershipType = BungieMembershipType.All;
             string requestUrl = $"https://www.bungie.net/platform/Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/";
-
-            HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
-            string json = httpResponse.Content.ReadAsStringAsync().Result;
+            string json = bungieApiProxy.SendRequest(requestUrl);
             SearchDestinyPlayerResponse response = JsonConvert.DeserializeObject<SearchDestinyPlayerResponse>(json);
 
             bool foundPlayer = false;
@@ -107,20 +80,6 @@ namespace EmissaryApi
             return foundPlayer;
         }
 
-
-        private string GetBungieApiKey()
-        {
-            string workingDirectory = Environment.CurrentDirectory;
-            string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
-            string secretsFileName = "secrets.json";
-            IConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                .SetBasePath(solutionDirectory)
-                .AddJsonFile(secretsFileName);
-            IConfiguration config = configBuilder.Build();
-            string bungieApiKeyName = "BungieApiKey";
-            string bungieApiKey = config[bungieApiKeyName];
-            return bungieApiKey;
-        }
 
     }
 }
