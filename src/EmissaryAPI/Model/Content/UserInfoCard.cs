@@ -12,16 +12,16 @@ namespace EmissaryApi.Model
         public string DisplayName { get; set; }
         
         [JsonProperty("membershipId")]
-        public string MembershipId { get; set; }
+        public long MembershipId { get; set; }
 
         [JsonProperty("membershipType")]
-        public long MembershipType { get; set; }
+        public int MembershipType { get; set; }
 
         [JsonProperty("iconPath")]
         public string IconPath { get; set; }
 
         [JsonProperty("crossSaveOverride")]
-        public long CrossSaveOverride { get; set; }
+        public int CrossSaveOverride { get; set; }
 
         [JsonProperty("isPublic")]
         public bool IsPublic { get; set; }
