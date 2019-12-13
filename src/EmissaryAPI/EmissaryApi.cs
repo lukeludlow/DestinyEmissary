@@ -49,6 +49,20 @@ namespace EmissaryApi
             return mostRecentlyPlayedCharacter.CharacterId;
         }
 
+        public List<UInt32> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
+        {        
+            string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
+            HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
+            string json = httpResponse.Content.ReadAsStringAsync().Result;
+            DestinyProfileCharacterEquipmentResponse response = JsonConvert.DeserializeObject<DestinyProfileCharacterEquipmentResponse>(json);
+            DestinyInventoryComponent characterInventory = response.Response.CharacterEquipment.Data[characterId];
+            List<UInt32> itemHashes = new List<UInt32>();
+            foreach (DestinyItemComponent item in characterInventory.Items) {
+                itemHashes.Add(item.ItemHash);
+            }
+            return itemHashes;
+        }
+
         private bool IsMoreRecentTime(DateTimeOffset first, DateTimeOffset second)
         {
             // Return value	        Meaning

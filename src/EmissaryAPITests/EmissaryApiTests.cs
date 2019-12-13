@@ -2,6 +2,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EmissaryApi;
 using EmissaryApi.Model;
+using System.Collections.Generic;
 
 namespace EmissaryApiTests
 {
@@ -14,15 +15,6 @@ namespace EmissaryApiTests
     {
 
 
-        // [TestMethod]
-        // public void CurrentlyEquipped_PersonalAccount_ShouldReturnPrimaryIzanagi()
-        // {
-        //     Emissary emissary = new Emissary();
-        //     long membershipId = 4611686018467260757;
-        //     DestinyProfileResponse actual = emissary.CurrentlyEquipped(membershipId);
-        //     Assert.Fail();
-        // }
-
         [TestMethod]
         public void GetMostRecentlyUsedCharacter_PersonalAccount_ShouldReturnTitanId()
         {
@@ -31,6 +23,17 @@ namespace EmissaryApiTests
             long expectedCharacterId = 2305843009504575107;
             long characterId = emissary.GetMostRecentlyPlayedCharacter(membershipId);
             Assert.AreEqual(expectedCharacterId, characterId);
+        }
+
+        [TestMethod]
+        public void GetCharacterEquipmentAsItemHashes_PersonalAccount_ShouldReturnListContainingItemHashForIzanagi()
+        {
+            Emissary emissary = new Emissary();
+            long membershipId = 4611686018467260757;
+            long characterId = 2305843009504575107;
+            UInt32 expectedItemHash = 0;
+            List<UInt32> actual = emissary.GetCharacterEquipmentAsItemHashes(membershipId, characterId);
+            Assert.IsTrue(actual.Contains(expectedItemHash));
         }
 
 

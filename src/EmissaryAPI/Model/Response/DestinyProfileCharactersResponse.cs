@@ -6,7 +6,7 @@ namespace EmissaryApi.Model
 {
     /// <summary>
     /// https://bungie-net.github.io/multi/schema_Destiny-Responses-DestinyProfileResponse.html#schema_Destiny-Responses-DestinyProfileResponse
-    /// 'characters' component   
+    /// 'characters' object property
     /// Basic information about each character, keyed by the CharacterId.
     /// COMPONENT TYPE: Characters
     /// </summary>
@@ -14,7 +14,7 @@ namespace EmissaryApi.Model
     {
 
         [JsonProperty("Response")]
-        public Response Response { get; set; }
+        public CharactersResponse Response { get; set; }
 
         [JsonProperty("ErrorCode")]
         public long ErrorCode { get; set; }
@@ -32,13 +32,13 @@ namespace EmissaryApi.Model
 
     }
 
-    public class Response
+    public class CharactersResponse
     {
         [JsonProperty("characters")]
-        public Characters Characters { get; set; }
+        public CharacterData Characters { get; set; }
     }
 
-    public class Characters
+    public class CharacterData
     {
         [JsonProperty("data")]
         public Dictionary<long, DestinyCharacterComponent> Data { get; set; }
