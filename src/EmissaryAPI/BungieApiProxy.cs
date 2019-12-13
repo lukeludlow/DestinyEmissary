@@ -23,13 +23,22 @@ namespace EmissaryApi
             return json;
         }
 
+
+        public Stream SendRequestAndReturnStream(string requestUrl)
+        {
+            // very much blocking. might want to change this later since it's a kinda big file.
+            HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
+            return httpResponse.Content.ReadAsStreamAsync().Result;
+        }
+
         private string GetBungieApiKey()
         {
             string workingDirectory = Environment.CurrentDirectory;
             string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+            string dataDirectory = Path.Combine(solutionDirectory, "data");
             string secretsFileName = "secrets.json";
             IConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                .SetBasePath(solutionDirectory)
+                .SetBasePath(dataDirectory)
                 .AddJsonFile(secretsFileName);
             IConfiguration config = configBuilder.Build();
             string bungieApiKeyName = "BungieApiKey";
