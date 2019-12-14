@@ -18,7 +18,7 @@ namespace EmissaryApi
             this.manifest = new Manifest();
         }
 
-        internal Emissary(BungieApiService bungieApiProxy, Manifest manifest)
+        public Emissary(IBungieApiService bungieApiProxy, Manifest manifest)
         {
             this.bungieApiService = bungieApiProxy;
             this.manifest = manifest;
