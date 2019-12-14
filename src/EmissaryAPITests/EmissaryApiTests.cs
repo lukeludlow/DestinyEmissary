@@ -31,9 +31,19 @@ namespace EmissaryApiTests
             Emissary emissary = new Emissary();
             long membershipId = 4611686018467260757;
             long characterId = 2305843009504575107;
-            UInt32 expectedItemHash = 0;
+            UInt32 expectedItemHash = 0;  // TODO ?
             List<UInt32> actual = emissary.GetCharacterEquipmentAsItemHashes(membershipId, characterId);
             Assert.IsTrue(actual.Contains(expectedItemHash));
+        }
+
+        [TestMethod]
+        public void GetCharacterEquipmentNames_PersonalAccount_x()
+        {
+            Emissary emissary = new Emissary();
+            long membershipId = 4611686018467260757;
+            long characterId = 2305843009504575107;
+            List<string> actual = emissary.GetCharacterEquipmentNames(membershipId, characterId);
+            Assert.Fail();
         }
 
 

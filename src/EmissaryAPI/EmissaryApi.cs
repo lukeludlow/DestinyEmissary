@@ -10,15 +10,18 @@ namespace EmissaryApi
     {
 
         private BungieApiProxy bungieApiProxy;
+        private Manifest manifest;
 
         public Emissary()
         {
             this.bungieApiProxy = new BungieApiProxy();
+            this.manifest = new Manifest();
         }
 
-        internal Emissary(BungieApiProxy bungieApiProxy)
+        internal Emissary(BungieApiProxy bungieApiProxy, Manifest manifest)
         {
             this.bungieApiProxy = bungieApiProxy;
+            this.manifest = manifest;
         }
 
 
@@ -48,6 +51,18 @@ namespace EmissaryApi
                 itemHashes.Add(item.ItemHash);
             }
             return itemHashes;
+        }
+
+        public List<string> GetCharacterEquipmentNames(long membershipId, long characterId)
+        {
+            List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
+            List<string> itemNames = new List<string>();
+            foreach (UInt32 itemHash in itemHashes) {
+                string json = manifest.GetDestinyInventoryItemDefinition(itemHash);
+                DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
+                itemNames.Add(item.DisplayProperties.Name);
+            }
+            return itemNames;
         }
 
         private bool IsMoreRecentTime(DateTimeOffset first, DateTimeOffset second)
