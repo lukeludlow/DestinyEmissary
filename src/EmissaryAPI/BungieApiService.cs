@@ -5,17 +5,17 @@ using Microsoft.Extensions.Configuration;
 
 namespace EmissaryApi
 {
-    internal class BungieApiProxy
+    internal class BungieApiService : IBungieApiService
     {
         private HttpClient httpClient;
 
-        public BungieApiProxy()
+        public BungieApiService()
         {
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
         }
 
-        public string SendRequest(string requestUrl)
+        public string Get(string requestUrl)
         {
             // note: this is blocking! (because i'm too lazy to implement async requests right now)
             HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;

@@ -9,26 +9,27 @@ namespace EmissaryApi
     public class Emissary
     {
 
-        private BungieApiProxy bungieApiProxy;
+        private IBungieApiService bungieApiService;
         private Manifest manifest;
 
         public Emissary()
         {
-            this.bungieApiProxy = new BungieApiProxy();
+            this.bungieApiService = new BungieApiService();
             this.manifest = new Manifest();
         }
 
-        internal Emissary(BungieApiProxy bungieApiProxy, Manifest manifest)
+        internal Emissary(BungieApiService bungieApiProxy, Manifest manifest)
         {
-            this.bungieApiProxy = bungieApiProxy;
+            this.bungieApiService = bungieApiProxy;
             this.manifest = manifest;
         }
 
 
         public long GetMostRecentlyPlayedCharacter(long membershipId)
         {
+            // get-characters-personal.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=200";
-            string json = bungieApiProxy.SendRequest(requestUrl);
+            string json = bungieApiService.Get(requestUrl);
             DestinyProfileCharactersResponse response = JsonConvert.DeserializeObject<DestinyProfileCharactersResponse>(json);
             List<DestinyCharacterComponent> characters = response.Response.Characters.Data.Values.ToList();
             DestinyCharacterComponent mostRecentlyPlayedCharacter = characters[0];
@@ -42,8 +43,9 @@ namespace EmissaryApi
 
         public List<UInt32> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
         {        
+            // get-character-equipment.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
-            string json = bungieApiProxy.SendRequest(requestUrl);
+            string json = bungieApiService.Get(requestUrl);
             DestinyProfileCharacterEquipmentResponse response = JsonConvert.DeserializeObject<DestinyProfileCharacterEquipmentResponse>(json);
             DestinyInventoryComponent characterInventory = response.Response.CharacterEquipment.Data[characterId];
             List<UInt32> itemHashes = new List<UInt32>();
@@ -78,9 +80,10 @@ namespace EmissaryApi
 
         public bool TrySearchDestinyPlayer(string displayName, out long membershipId)
         {
+            // search-destiny-player.json
             int membershipType = BungieMembershipType.All;
             string requestUrl = $"https://www.bungie.net/platform/Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/";
-            string json = bungieApiProxy.SendRequest(requestUrl);
+            string json = bungieApiService.Get(requestUrl);
             SearchDestinyPlayerResponse response = JsonConvert.DeserializeObject<SearchDestinyPlayerResponse>(json);
 
             bool foundPlayer = false;
