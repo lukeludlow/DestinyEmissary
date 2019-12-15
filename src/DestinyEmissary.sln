@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emissary", "Emissary\Emissary.csproj", "{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApi", "Api\EmissaryApi.csproj", "{172978DE-6138-40BF-A992-6DDD83211DB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApiTests", "ApiTests\EmissaryApiTests.csproj", "{BB1AE190-8B73-480A-9893-ED7F80A8288C}"
@@ -24,18 +22,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|x64.Build.0 = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Debug|x86.Build.0 = Debug|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|x64.ActiveCfg = Release|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|x64.Build.0 = Release|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|x86.ActiveCfg = Release|Any CPU
-		{DCD14A9F-522A-4F0E-82DA-FE59B253AB43}.Release|x86.Build.0 = Release|Any CPU
 		{172978DE-6138-40BF-A992-6DDD83211DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{172978DE-6138-40BF-A992-6DDD83211DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{172978DE-6138-40BF-A992-6DDD83211DB4}.Debug|x64.ActiveCfg = Debug|Any CPU
