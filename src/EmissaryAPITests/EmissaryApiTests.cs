@@ -31,6 +31,31 @@ namespace EmissaryApiTests
             Assert.AreEqual(expectedCharacterId, characterId);
         }
 
+
+
+        [TestMethod]
+        public void GetCurrentlyEquipped_PersonalAccount_ShouldReturnKineticIzanagi()
+        {
+
+            Mock<IBungieApiService> mock = new Mock<IBungieApiService>();
+            string charactersRequest = "https://www.bungie.net/Platform/Destiny2/3/Profile/4611686018467260757/?components=200";
+            string charactersResponse = ReadFile("get-characters-personal.json");
+            string characterInventoryRequest = "https://www.bungie.net/Platform/Destiny2/3/Profile/4611686018467260757/?components=205";
+            string characterInventoryResponse = ReadFile("get-character-equipment-personal.json");
+            mock.Setup(m => m.Get(charactersRequest)).Returns(charactersResponse);
+            mock.Setup(m => m.Get(characterInventoryRequest)).Returns(characterInventoryResponse);
+
+            Emissary emissary = new Emissary(mock.Object, new Manifest());
+            long membershipId = 4611686018467260757;
+
+            Loadout currentlyEquipped = emissary.GetCurrentlyEquipped(membershipId);
+
+            Assert.AreEqual("Izanagi's Burden", currentlyEquipped.KineticWeapon.Name);
+        }
+
+
+
+
         [TestMethod]
         public void GetCharacterEquipmentAsItemHashes_PersonalAccount_ShouldReturnListContainingItemHashForIzanagi()
         {

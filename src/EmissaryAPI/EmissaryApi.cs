@@ -12,16 +12,41 @@ namespace EmissaryApi
         private IBungieApiService bungieApiService;
         private Manifest manifest;
 
-        public Emissary()
-        {
-            this.bungieApiService = new BungieApiService();
-            this.manifest = new Manifest();
-        }
-
         public Emissary(IBungieApiService bungieApiProxy, Manifest manifest)
         {
             this.bungieApiService = bungieApiProxy;
             this.manifest = manifest;
+        }
+
+        public Loadout GetCurrentlyEquipped(long membershipId)
+        {
+            Loadout currentlyEquipped = new Loadout();
+            long characterId = GetMostRecentlyPlayedCharacter(membershipId);
+            List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
+
+            foreach (UInt32 itemHash in itemHashes) {
+                string json = manifest.GetDestinyInventoryItemDefinition(itemHash);
+                DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
+                if (ItemIsKineticWeapon(item)) {
+                    currentlyEquipped.KineticWeapon = new Weapon(item.DisplayProperties.Name, "Kinetic Weapon");
+                }
+            }
+
+            return currentlyEquipped;
+        }
+
+        private bool ItemIsKineticWeapon(DestinyInventoryItem item)
+        {
+            bool itemIsWeapon = false;
+            foreach (UInt32 itemCategoryHash in item.ItemCategoryHashes) {
+                string json = manifest.GetDestinyItemCategoryDefinition(itemCategoryHash);
+                DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+                if (itemCategory.DisplayProperties.Name == "Kinetic Weapon") {
+                    itemIsWeapon = true;
+                    break;
+                }
+            } 
+            return itemIsWeapon;
         }
 
 

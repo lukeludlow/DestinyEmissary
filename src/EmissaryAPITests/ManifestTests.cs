@@ -17,7 +17,7 @@ namespace EmissaryApiTests
         {
             // id -1083160297
             Manifest manifest = new Manifest();
-            UInt32 itemHash = 3211806999; // izanagi's burden inventory item hash
+            UInt32 itemHash = 3211806999;  // izanagi's burden inventory item hash
 
             DestinyInventoryItem expectedItem = new DestinyInventoryItem();
             expectedItem.DisplayProperties = new DestinyDisplayPropertiesDefinition();
@@ -27,6 +27,19 @@ namespace EmissaryApiTests
             DestinyInventoryItem actualItem = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
 
             Assert.AreEqual(expectedItem.DisplayProperties.Name, actualItem.DisplayProperties.Name);
+        }
+
+        [TestMethod]
+        public void GetDestinyItemCategoryDefinition_2_ShouldReturnKineticWeapon()
+        {
+            Manifest manifest = new Manifest();
+            UInt32 itemCategoryHash = 2;  // Kinetic Weapon
+            DestinyItemCategory expectedItemCategory = new DestinyItemCategory();
+            expectedItemCategory.DisplayProperties = new DestinyDisplayPropertiesDefinition();
+            expectedItemCategory.DisplayProperties.Name = "Kinetic Weapon";
+            string json = manifest.GetDestinyItemCategoryDefinition(itemCategoryHash);
+            DestinyItemCategory actualItemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+            Assert.AreEqual(expectedItemCategory.DisplayProperties.Name, actualItemCategory.DisplayProperties.Name);
         }
 
 

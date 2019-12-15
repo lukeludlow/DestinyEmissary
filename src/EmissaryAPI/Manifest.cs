@@ -20,18 +20,36 @@ namespace EmissaryApi
             // this.bungieApiProxy = new BungieApiService();
         }
 
+        public string GetDestinyItemCategoryDefinition(UInt32 itemCategoryHash)
+        {
+            int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
+            string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
+            return ExecuteCommandOnManifestDatabase(commandText);
+        }
+
         public string GetDestinyInventoryItemDefinition(UInt32 itemHash)
+        {
+            int itemId = ConvertHashToTableId(itemHash);
+            string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
+            return ExecuteCommandOnManifestDatabase(commandText);
+        }
+
+        private int ConvertHashToTableId(UInt32 hash)
+        {
+            int id = (int)hash;
+            // TODO what does this do???
+            // if ((id & (1 << (32 - 1))) != 0) {
+                // id = id - (1 << 32);
+            // }
+            return id;
+        }
+
+        private string ExecuteCommandOnManifestDatabase(string commandText)
         {
             string dbPath = GetLocalManifestFilePath();
             string queryResult = "";
             using (SqliteConnection db = new SqliteConnection($"Filename={dbPath}")) {
                 db.Open();
-                // perform the query using json extensions. this makes life a lot easier, because otherwise 
-                // i have to manually convert the uint32 itemHash using bitshift stuff
-                string commandText =
-                        "SELECT json_extract(DestinyInventoryItemDefinition.json, '$')" +
-                        "FROM DestinyInventoryItemDefinition, json_tree(DestinyInventoryItemDefinition.json, '$')" +
-                        $"WHERE json_tree.key = 'hash' AND json_tree.value = {itemHash}";
                 SqliteCommand selectCommand = new SqliteCommand(commandText, db);
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 reader.Read();
