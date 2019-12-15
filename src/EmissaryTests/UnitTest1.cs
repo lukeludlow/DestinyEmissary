@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Emissary;
 
-namespace EmissaryBotTests
+namespace EmissaryTests
 {
     [TestClass]
     public class UnitTest1
@@ -8,6 +9,7 @@ namespace EmissaryBotTests
         [TestMethod]
         public void TestMethod1()
         {
+            Assert.Fail();
         }
     }
 }
