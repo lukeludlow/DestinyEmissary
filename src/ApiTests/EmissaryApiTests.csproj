@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EmissaryApi\EmissaryApi.csproj" />
+    <ProjectReference Include="..\Api\EmissaryApi.csproj" />
   </ItemGroup>
 
 </Project>
