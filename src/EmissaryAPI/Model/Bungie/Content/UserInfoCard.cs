@@ -7,7 +7,6 @@ namespace EmissaryApi.Model
 	/// </summary>
     public class UserInfoCard
     {
-
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }
         
@@ -31,6 +30,5 @@ namespace EmissaryApi.Model
 
         [JsonProperty("applicableMembershipTypes")]
         public int[] ApplicableMembershipTypes { get; set; }
-
     }
 }

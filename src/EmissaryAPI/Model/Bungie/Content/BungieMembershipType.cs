@@ -5,7 +5,6 @@ namespace EmissaryApi.Model
 {
     public static class BungieMembershipType
     {
-
         // "All" is only valid for searching capabilities: you need to pass the actual matching BungieMembershipType for
         // any query where you pass a known membershipId.
         public static readonly int All = -1;

@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace EmissaryApi.Model
+namespace EmissaryApi
 {
     /// <summary>
     /// mobile manifest entity!
@@ -9,7 +9,6 @@ namespace EmissaryApi.Model
     /// </summary>
     public class DestinyInventoryItem
     {
-
         [JsonProperty("displayProperties")]
         public DestinyDisplayPropertiesDefinition DisplayProperties { get; set; }
 
@@ -20,19 +19,5 @@ namespace EmissaryApi.Model
         // https://bungie-net.github.io/multi/schema_Destiny-Definitions-DestinyItemCategoryDefinition.html#schema_Destiny-Definitions-DestinyItemCategoryDefinition
         [JsonProperty("itemCategoryHashes")]
         public UInt32[] ItemCategoryHashes { get; set; }
-
-
-
     }
-
-    /// <summary>
-	/// https://bungie-net.github.io/multi/schema_Destiny-Definitions-Common-DestinyDisplayPropertiesDefinition.html#schema_Destiny-Definitions-Common-DestinyDisplayPropertiesDefinition
-	/// </summary>
-    public class DestinyDisplayPropertiesDefinition
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-    }
-
-
 }
