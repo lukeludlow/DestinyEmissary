@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace Emissary.Modules
+namespace Emissary
 {
     public class InfoModule : ModuleBase<SocketCommandContext>
     {

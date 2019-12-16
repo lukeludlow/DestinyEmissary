@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
@@ -10,16 +11,19 @@ namespace Emissary
     {
         private readonly DiscordSocketClient discordClient;
         private readonly CommandService commandService;
+        private readonly LogService logService;
         private readonly IConfigurationRoot config;
         private readonly IServiceProvider serviceProvider;
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands, IConfigurationRoot configuration, IServiceProvider services)
+        public CommandHandler(DiscordSocketClient client, CommandService commands, LogService logger, IConfigurationRoot configuration, IServiceProvider services)
         {
             discordClient = client;
             commandService = commands;
+            logService = logger;
             config = configuration;
             serviceProvider = services;
             discordClient.MessageReceived += OnMessageReceivedAsync;
+            commandService.CommandExecuted += OnCommandExecutedAsync;
         }
 
         private async Task OnMessageReceivedAsync(SocketMessage messageParam)
@@ -35,6 +39,13 @@ namespace Emissary
                 SocketCommandContext context = new SocketCommandContext(discordClient, message);
                 await commandService.ExecuteAsync(context, argPos, serviceProvider);
             }
+        }
+
+        private async Task OnCommandExecutedAsync(Optional<CommandInfo> commandInfo, ICommandContext context, IResult result)
+        {
+            string commandName = commandInfo.IsSpecified ? commandInfo.Value.Name : "unknown command";
+            LogMessage logMessage = new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}");
+            await logService.LogAsync(logMessage);
         }
 
     }

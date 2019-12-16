@@ -11,11 +11,10 @@ namespace Emissary
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; }
+        public IConfigurationRoot Configuration { get; private set; }
 
         public Startup()
         {
-            Configuration = BuildConfiguration();
         }
 
         public static async Task MainAsync()
@@ -26,13 +25,17 @@ namespace Emissary
 
         public async Task RunAsync()
         {
+            Configuration = BuildConfiguration();
+
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(services);
 
             IServiceProvider provider = services.BuildServiceProvider();
-            provider.GetRequiredService<LoggingService>();  // start the logging services
-            provider.GetRequiredService<CommandHandler>();  // start the command handler service
-            await provider.GetRequiredService<StartupService>().StartAsync();  // start the startup service which actually "runs" the bot
+            provider.GetRequiredService<LogService>();  
+            provider.GetRequiredService<CommandHandler>();  
+
+            // start the startup service which actually runs the bot
+            await provider.GetRequiredService<StartupService>().StartAsync();  
             // block this task until the program is closed
             await Task.Delay(-1);
         }
@@ -42,13 +45,16 @@ namespace Emissary
             services.AddSingleton(new DiscordSocketClient())
                     .AddSingleton(new CommandService())
                     .AddSingleton<CommandHandler>()
-                    .AddSingleton<LoggingService>()
+                    .AddSingleton<LogService>()
                     .AddSingleton<StartupService>()
                     .AddSingleton(Configuration);
         }
 
         private IConfigurationRoot BuildConfiguration()
         {
+            // TODO detect where the config.json file is
+            // we are in "production" (running from the console)
+            // we are in "development" (running unit tests)
             IConfigurationBuilder builder = new ConfigurationBuilder()
                           .SetBasePath(Directory.GetCurrentDirectory())
                           .AddJsonFile("config.json", optional: false, reloadOnChange: true)

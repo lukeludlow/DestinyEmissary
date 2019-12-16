@@ -7,22 +7,22 @@ using Discord.WebSocket;
 
 namespace Emissary
 {
-    public class LoggingService
+    public class LogService
     {
         private readonly DiscordSocketClient discordClient;
         private readonly CommandService commandService;
 
-        public LoggingService(DiscordSocketClient client, CommandService commands)
+        public LogService(DiscordSocketClient client, CommandService commands)
         {
             discordClient = client;
             commandService = commands;
-            discordClient.Log += OnLogAsync;
-            commandService.Log += OnLogAsync;
+            discordClient.Log += LogAsync;
+            commandService.Log += LogAsync;
         }
 
-        private Task OnLogAsync(LogMessage message)
+        public async Task LogAsync(LogMessage message)
         {
-            return Console.Out.WriteLineAsync(message.ToString());
+            await Console.Out.WriteLineAsync(message.ToString());
         }
 
     }
