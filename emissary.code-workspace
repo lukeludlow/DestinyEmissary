@@ -6,7 +6,7 @@
   ],
   "settings": {
     "files.autoSave": "afterDelay",
-    "dotnet-test-explorer.testProjectPath": "**/*(EmissaryApiTests).csproj",
+    "dotnet-test-explorer.testProjectPath": "**/*(EmissaryTests|EmissaryApiTests).csproj",
     "csharpfixformat.style.braces.onSameLine": true,
     "[csharp]": {
       "editor.defaultFormatter": "ms-vscode.csharp",
