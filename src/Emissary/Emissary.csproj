@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.0</TargetFramework>
-		<UserSecretsId>f9db4c71-bd31-42f0-8b5a-72dad71ac30a</UserSecretsId>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Discord.Net" Version="2.1.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <UserSecretsId>25a0b8b3-c48e-4ec6-8c1f-31fe115ad178</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="RestSharp" Version="106.6.10" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
 </Project>

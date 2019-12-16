@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp3.0</TargetFramework>
+		<UserSecretsId>f9db4c71-bd31-42f0-8b5a-72dad71ac30a</UserSecretsId>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Discord.Net" Version="2.1.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
+	</ItemGroup>
+</Project>

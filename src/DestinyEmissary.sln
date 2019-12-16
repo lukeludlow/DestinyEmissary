@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApi", "Api\EmissaryApi.csproj", "{172978DE-6138-40BF-A992-6DDD83211DB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emissary", "Emissary\Emissary.csproj", "{172978DE-6138-40BF-A992-6DDD83211DB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryApiTests", "ApiTests\EmissaryApiTests.csproj", "{BB1AE190-8B73-480A-9893-ED7F80A8288C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryTests", "EmissaryTests\EmissaryTests.csproj", "{BB1AE190-8B73-480A-9893-ED7F80A8288C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emissary", "Emissary\Emissary.csproj", "{B4B6545A-AC2B-4DB0-B18B-442FE5E3CD40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmissaryBot", "EmissaryBot\EmissaryBot.csproj", "{B4B6545A-AC2B-4DB0-B18B-442FE5E3CD40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

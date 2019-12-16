@@ -3,6 +3,11 @@ secrets.json
 appsettings.json
 config.json
 
+# data (world manifest and user info)
+*.manifest 
+*.db 
+
+
 # Created by https://www.gitignore.io/api/csharp,dotnetcore
 # Edit at https://www.gitignore.io/?templates=csharp,dotnetcore
 
