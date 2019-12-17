@@ -7,39 +7,38 @@ using Microsoft.Data.Sqlite;
 
 namespace Emissary
 {
-    public class Manifest
+    public class ManifestAccessor : IManifestAccessor
     {
 
-        // TODO turn this into an interface and mock it 
-        // private BungieApiService bungieApiProxy;
+        // private IBungieApiService bungieApiService;
 
         // public string CurrentVersion { get; set; }
 
-        public Manifest()
+        public ManifestAccessor()
         {
-            // this.bungieApiProxy = new BungieApiService();
+            // this.bungieApiService = new BungieApiService();
         }
 
-        public string GetDestinyItemCategoryDefinition(UInt32 itemCategoryHash)
-        {
-            int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
-            string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
-            return ExecuteCommandOnManifestDatabase(commandText);
-        }
-
-        public string GetDestinyInventoryItemDefinition(UInt32 itemHash)
+        public string LookupItem(uint itemHash)
         {
             int itemId = ConvertHashToTableId(itemHash);
             string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
             return ExecuteCommandOnManifestDatabase(commandText);
         }
 
-        private int ConvertHashToTableId(UInt32 hash)
+        public string LookupItemCategory(uint itemCategoryHash)
+        {
+            int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
+            string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
+            return ExecuteCommandOnManifestDatabase(commandText);
+        }
+
+        private int ConvertHashToTableId(uint hash)
         {
             int id = (int)hash;
             // TODO what does this do???
             // if ((id & (1 << (32 - 1))) != 0) {
-                // id = id - (1 << 32);
+            // id = id - (1 << 32);
             // }
             return id;
         }
@@ -68,6 +67,8 @@ namespace Emissary
             string localManifestFile = Path.Combine(dataDirectory, localManifestFileName);
             return localManifestFile;
         }
+
+
 
         // TODO make it so that this checks for the latest version and downloads the new manifest only if needed
         // public void LoadLatestManifest()

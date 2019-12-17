@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using Emissary.Model;
 using Microsoft.Extensions.Configuration;
 
 namespace Emissary
@@ -15,14 +16,30 @@ namespace Emissary
             this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
         }
 
-        public string Get(string requestUrl)
+        public DestinyProfileCharactersResponse GetCharacters(int membershipType, long bungieId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DestinyProfileCharacterEquipmentResponse GetEquipment(int membershipType, long bungieId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SearchDestinyPlayerResponse SearchDestinyPlayer(int membershipType, string displayName)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        // send a GET request to the specified URL to retrieve information (from the bungie api)
+        private string Get(string requestUrl)
         {
             // note: this is blocking! (because i'm too lazy to implement async requests right now)
             HttpResponseMessage httpResponse = httpClient.GetAsync(requestUrl).Result;
             string json = httpResponse.Content.ReadAsStringAsync().Result;
             return json;
         }
-
 
         public Stream SendRequestAndReturnStream(string requestUrl)
         {

@@ -1,21 +1,53 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Emissary.Common;
 using Emissary.Model;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Emissary
 {
-    public class Emissary
+    // note: discord IDs are UInt64 (ulong). bungie IDs are Int64 (long).
+    public class Emissary : IEmissary
     {
-
         private IBungieApiService bungieApiService;
-        private Manifest manifest;
+        private IManifestAccessor manifestAccessor;
 
-        public Emissary(IBungieApiService bungieApiProxy, Manifest manifest)
+        public string CurrentlyEquipped(ulong discordId)
         {
-            this.bungieApiService = bungieApiProxy;
-            this.manifest = manifest;
+            throw new NotImplementedException();
+        }
+
+        public string ListLoadouts(ulong discordId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string EquipLoadout(ulong discordId, string loadoutName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string SaveLoadout(ulong discordId, string loadoutName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DeleteLoadout(ulong discordId, string loadoutName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Register(ulong discordId, long bungieId)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Emissary(IBungieApiService bungieApiService, IManifestAccessor manifestAccessor)
+        {
+            this.bungieApiService = bungieApiService;
+            this.manifestAccessor = manifestAccessor;
         }
 
         public Loadout GetCurrentlyEquipped(long membershipId)
@@ -25,7 +57,7 @@ namespace Emissary
             List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
 
             foreach (UInt32 itemHash in itemHashes) {
-                string json = manifest.GetDestinyInventoryItemDefinition(itemHash);
+                string json = manifestAccessor.LookupItem(itemHash);
                 DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
                 if (ItemIsKineticWeapon(item)) {
                     currentlyEquipped.KineticWeapon = new Weapon(item.DisplayProperties.Name, "Kinetic Weapon");
@@ -39,13 +71,13 @@ namespace Emissary
         {
             bool itemIsWeapon = false;
             foreach (UInt32 itemCategoryHash in item.ItemCategoryHashes) {
-                string json = manifest.GetDestinyItemCategoryDefinition(itemCategoryHash);
+                string json = manifestAccessor.LookupItemCategory(itemCategoryHash);
                 DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
                 if (itemCategory.DisplayProperties.Name == "Kinetic Weapon") {
                     itemIsWeapon = true;
                     break;
                 }
-            } 
+            }
             return itemIsWeapon;
         }
 
@@ -54,7 +86,8 @@ namespace Emissary
         {
             // get-characters-personal.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=200";
-            string json = bungieApiService.Get(requestUrl);
+            // string json = bungieApiService.Get(requestUrl);
+            string json = "";
             DestinyProfileCharactersResponse response = JsonConvert.DeserializeObject<DestinyProfileCharactersResponse>(json);
             List<DestinyCharacterComponent> characters = response.Response.Characters.Data.Values.ToList();
             DestinyCharacterComponent mostRecentlyPlayedCharacter = characters[0];
@@ -67,10 +100,11 @@ namespace Emissary
         }
 
         public List<UInt32> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
-        {        
+        {
             // get-character-equipment.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
-            string json = bungieApiService.Get(requestUrl);
+            // string json = bungieApiService.Get(requestUrl);
+            string json = "";
             DestinyProfileCharacterEquipmentResponse response = JsonConvert.DeserializeObject<DestinyProfileCharacterEquipmentResponse>(json);
             DestinyInventoryComponent characterInventory = response.Response.CharacterEquipment.Data[characterId];
             List<UInt32> itemHashes = new List<UInt32>();
@@ -85,7 +119,7 @@ namespace Emissary
             List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
             List<string> itemNames = new List<string>();
             foreach (UInt32 itemHash in itemHashes) {
-                string json = manifest.GetDestinyInventoryItemDefinition(itemHash);
+                string json = manifestAccessor.LookupItem(itemHash);
                 DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
                 itemNames.Add(item.DisplayProperties.Name);
             }
@@ -108,7 +142,8 @@ namespace Emissary
             // search-destiny-player.json
             int membershipType = BungieMembershipType.All;
             string requestUrl = $"https://www.bungie.net/platform/Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/";
-            string json = bungieApiService.Get(requestUrl);
+            // string json = bungieApiService.Get(requestUrl);
+            string json = "";
             SearchDestinyPlayerResponse response = JsonConvert.DeserializeObject<SearchDestinyPlayerResponse>(json);
 
             bool foundPlayer = false;
@@ -122,7 +157,6 @@ namespace Emissary
             }
             return foundPlayer;
         }
-
 
     }
 }
