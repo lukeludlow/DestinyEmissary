@@ -1,13 +1,24 @@
+using System;
 
 namespace Emissary.Model
 {
     public class Loadout
     {
         public Weapon KineticWeapon { get; set; }
+        public Weapon EnergyWeapon { get; set; }
+        public Weapon HeavyWeapon { get; set; }
 
-        public Loadout()
+        public Armor HelmetArmor { get; set; }
+        public Armor GauntletArmor { get; set; }
+        public Armor ChestArmor { get; set; }
+        public Armor LegArmor { get; set; }
+        public Armor ClassItemArmor { get; set; }
+
+        public CharacterClass CharacterClass { get; set; }
+
+        public string ToJson()
         {
-            this.KineticWeapon = new Weapon("unknown", "unknown");
+            throw new NotImplementedException();
         }
     }
 }

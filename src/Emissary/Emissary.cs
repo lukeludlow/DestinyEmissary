@@ -59,7 +59,7 @@ namespace Emissary
             foreach (uint itemHash in itemHashes) {
                 DestinyItem item = manifestAccessor.LookupItem(itemHash);
                 if (ItemIsKineticWeapon(item)) {
-                    currentlyEquipped.KineticWeapon = new Weapon(item.DisplayProperties.Name, "Kinetic Weapon");
+                    // currentlyEquipped.KineticWeapon = new Weapon(item.DisplayProperties.Name, "Kinetic Weapon");
                 }
             }
 
