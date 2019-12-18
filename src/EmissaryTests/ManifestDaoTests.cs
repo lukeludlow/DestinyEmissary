@@ -8,10 +8,10 @@ using Newtonsoft.Json;
 using Moq;
 using Microsoft.Data.Sqlite;
 
-namespace Emissary.Tests
+namespace EmissaryTests
 {
     [TestClass]
-    public class ManifestAccessorTests
+    public class ManifestDaoTests
     {
 
         [TestMethod]
@@ -21,7 +21,7 @@ namespace Emissary.Tests
             string jsonFileName = "item-izanagi.json";
             string json = TestUtils.ReadFile(jsonFileName);
             IDatabaseAccessor mockDatabaseAccessor = Mock.Of<IDatabaseAccessor>(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$")) == json);
-            IManifestAccessor manifestAccessor = new ManifestAccessor(mockDatabaseAccessor);
+            IManifestDao manifestAccessor = new ManifestDao(mockDatabaseAccessor);
             // string itemName = "Izanagi's Burden";
             // uint[] itemCategoryHashes = new uint[] { 2, 1, 10 };
             DestinyItem expected = JsonConvert.DeserializeObject<DestinyItem>(json);
@@ -37,7 +37,7 @@ namespace Emissary.Tests
             string jsonFileName = "category-kinetic-weapon.json";
             string json = TestUtils.ReadFile(jsonFileName);
             IDatabaseAccessor mockDatabaseAccessor = Mock.Of<IDatabaseAccessor>(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$")) == json);
-            IManifestAccessor manifestAccessor = new ManifestAccessor(mockDatabaseAccessor);
+            IManifestDao manifestAccessor = new ManifestDao(mockDatabaseAccessor);
             DestinyItemCategory expected = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
             DestinyItemCategory actual = manifestAccessor.LookupItemCategory(itemCategoryHash);
             Assert.AreEqual(expected.DisplayProperties.Name, actual.DisplayProperties.Name);
@@ -49,7 +49,7 @@ namespace Emissary.Tests
             uint itemHash = 3211806999;  
             Mock<IDatabaseAccessor> mockDatabaseAccessor = new Mock<IDatabaseAccessor>();
             mockDatabaseAccessor.Setup(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$"))).Throws(new SqliteException("", 0));
-            IManifestAccessor manifestAccessor = new ManifestAccessor(mockDatabaseAccessor.Object);
+            IManifestDao manifestAccessor = new ManifestDao(mockDatabaseAccessor.Object);
             Assert.ThrowsException<EmissaryDataAccessException>(() => manifestAccessor.LookupItem(itemHash));
         }
 
@@ -57,7 +57,7 @@ namespace Emissary.Tests
         public void LookupItem_ItemDoesNotExist_ShouldThrowException()
         {
             uint itemHash = 1;  // this id does not exist in the manifest database
-            IManifestAccessor manifestAccessor = new ManifestAccessor(new DatabaseAccessor());
+            IManifestDao manifestAccessor = new ManifestDao(new DatabaseAccessor());
             // Mock<IDatabaseAccessor> mockDatabaseAccessor = new Mock<IDatabaseAccessor>();
             // mockDatabaseAccessor.Setup(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$"))).Throws(new SqliteException("", 0));
             // IManifestAccessor manifestAccessor = new ManifestAccessor(mockDatabaseAccessor.Object);

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using Moq;
 
-namespace Emissary.Tests
+namespace EmissaryTests
 {
     // random side note. if i run the tests in iterm and then can't see what i'm typing, 
     // then enter the command `stty sane`

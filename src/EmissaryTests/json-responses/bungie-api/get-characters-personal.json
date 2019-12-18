@@ -1,0 +1,143 @@
+{
+  "Response": {
+    "characters": {
+      "data": {
+        "2305843009470834170": {
+          "membershipId": "4611686018467260757",
+          "membershipType": 3,
+          "characterId": "2305843009470834170",
+          "dateLastPlayed": "2019-12-13T02:31:43Z",
+          "minutesPlayedThisSession": "176",
+          "minutesPlayedTotal": "8970",
+          "light": 947,
+          "stats": {
+            "1935470627": 947,
+            "2996146975": 55,
+            "392767087": 29,
+            "1943323491": 68,
+            "1735777505": 45,
+            "144602215": 31,
+            "4244567218": 23
+          },
+          "raceHash": 3887404748,
+          "genderHash": 2204441813,
+          "classHash": 2271682572,
+          "raceType": 0,
+          "classType": 2,
+          "genderType": 1,
+          "emblemPath": "/common/destiny2_content/icons/892a423ae9018458592f2fcce6852b60.jpg",
+          "emblemBackgroundPath": "/common/destiny2_content/icons/2757207bb6ef08a2483557658cdd376f.jpg",
+          "emblemHash": 4159550313,
+          "emblemColor": { "red": 13, "green": 11, "blue": 16, "alpha": 255 },
+          "levelProgression": {
+            "progressionHash": 1716568313,
+            "dailyProgress": 0,
+            "dailyLimit": 0,
+            "weeklyProgress": 0,
+            "weeklyLimit": 0,
+            "currentProgress": 0,
+            "level": 50,
+            "levelCap": 50,
+            "stepIndex": 50,
+            "progressToNextLevel": 0,
+            "nextLevelAt": 0
+          },
+          "baseCharacterLevel": 50,
+          "percentToNextLevel": 0.0
+        },
+        "2305843009504575107": {
+          "membershipId": "4611686018467260757",
+          "membershipType": 3,
+          "characterId": "2305843009504575107",
+          "dateLastPlayed": "2019-12-14T05:15:30Z",
+          "minutesPlayedThisSession": "113",
+          "minutesPlayedTotal": "9881",
+          "light": 961,
+          "stats": {
+            "1935470627": 961,
+            "2996146975": 62,
+            "392767087": 32,
+            "1943323491": 71,
+            "1735777505": 28,
+            "144602215": 49,
+            "4244567218": 32
+          },
+          "raceHash": 2803282938,
+          "genderHash": 2204441813,
+          "classHash": 3655393761,
+          "raceType": 1,
+          "classType": 0,
+          "genderType": 1,
+          "emblemPath": "/common/destiny2_content/icons/892a423ae9018458592f2fcce6852b60.jpg",
+          "emblemBackgroundPath": "/common/destiny2_content/icons/2757207bb6ef08a2483557658cdd376f.jpg",
+          "emblemHash": 4159550313,
+          "emblemColor": { "red": 13, "green": 11, "blue": 16, "alpha": 255 },
+          "levelProgression": {
+            "progressionHash": 1716568313,
+            "dailyProgress": 0,
+            "dailyLimit": 0,
+            "weeklyProgress": 0,
+            "weeklyLimit": 0,
+            "currentProgress": 0,
+            "level": 50,
+            "levelCap": 50,
+            "stepIndex": 50,
+            "progressToNextLevel": 0,
+            "nextLevelAt": 0
+          },
+          "baseCharacterLevel": 50,
+          "percentToNextLevel": 0.0
+        },
+        "2305843009557154440": {
+          "membershipId": "4611686018467260757",
+          "membershipType": 3,
+          "characterId": "2305843009557154440",
+          "dateLastPlayed": "2019-11-25T03:34:56Z",
+          "minutesPlayedThisSession": "16",
+          "minutesPlayedTotal": "16",
+          "light": 941,
+          "stats": {
+            "1935470627": 941,
+            "2996146975": 30,
+            "392767087": 19,
+            "1943323491": 63,
+            "1735777505": 29,
+            "144602215": 38,
+            "4244567218": 40
+          },
+          "raceHash": 2803282938,
+          "genderHash": 2204441813,
+          "classHash": 671679327,
+          "raceType": 1,
+          "classType": 1,
+          "genderType": 1,
+          "emblemPath": "/common/destiny2_content/icons/5dc023c8be5d682eae90be7f5d420f69.jpg",
+          "emblemBackgroundPath": "/common/destiny2_content/icons/e452c62485491a02fbc0e36f06d301d2.jpg",
+          "emblemHash": 1907674138,
+          "emblemColor": { "red": 15, "green": 40, "blue": 48, "alpha": 255 },
+          "levelProgression": {
+            "progressionHash": 1716568313,
+            "dailyProgress": 0,
+            "dailyLimit": 0,
+            "weeklyProgress": 0,
+            "weeklyLimit": 0,
+            "currentProgress": 0,
+            "level": 50,
+            "levelCap": 50,
+            "stepIndex": 50,
+            "progressToNextLevel": 0,
+            "nextLevelAt": 0
+          },
+          "baseCharacterLevel": 50,
+          "percentToNextLevel": 0.0
+        }
+      },
+      "privacy": 1
+    }
+  },
+  "ErrorCode": 1,
+  "ThrottleSeconds": 0,
+  "ErrorStatus": "Success",
+  "Message": "Ok",
+  "MessageData": {}
+}

@@ -11,7 +11,7 @@ namespace Emissary
     public class Emissary : IEmissary
     {
         private IBungieApiService bungieApiService;
-        private IManifestAccessor manifestAccessor;
+        private IManifestDao manifestAccessor;
 
         public string CurrentlyEquipped(ulong discordId)
         {
@@ -44,7 +44,7 @@ namespace Emissary
         }
 
 
-        public Emissary(IBungieApiService bungieApiService, IManifestAccessor manifestAccessor)
+        public Emissary(IBungieApiService bungieApiService, IManifestDao manifestAccessor)
         {
             this.bungieApiService = bungieApiService;
             this.manifestAccessor = manifestAccessor;

@@ -8,14 +8,14 @@ using Microsoft.Data.Sqlite;
 
 namespace Emissary
 {
-    public class ManifestAccessor : IManifestAccessor
+    public class ManifestDao : IManifestDao
     {
         private IDatabaseAccessor databaseAccessor;
         private string manifestPath;
         // private IBungieApiService bungieApiService;
         // public string CurrentVersion { get; set; }
 
-        public ManifestAccessor(IDatabaseAccessor databaseAccessor)
+        public ManifestDao(IDatabaseAccessor databaseAccessor)
         {
             this.databaseAccessor = databaseAccessor;
             this.manifestPath = GetManifestPath();

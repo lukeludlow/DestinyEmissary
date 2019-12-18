@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Emissary.Tests
+namespace EmissaryTests
 {
     public class TestUtils
     {
