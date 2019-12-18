@@ -1,8 +1,10 @@
+using Emissary.Model;
+
 namespace Emissary
 {
     public interface IManifestAccessor
     {
-        string LookupItem(uint itemHash);
-        string LookupItemCategory(uint itemCategoryHash);
+        DestinyItem LookupItem(uint itemHash);
+        DestinyItemCategory LookupItemCategory(uint itemCategoryHash);
     }
 }

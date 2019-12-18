@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Emissary.Model;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,28 +10,42 @@ namespace Emissary
 {
     public class ManifestAccessor : IManifestAccessor
     {
-
+        private IDatabaseAccessor databaseAccessor;
+        private string manifestPath;
         // private IBungieApiService bungieApiService;
-
         // public string CurrentVersion { get; set; }
 
-        public ManifestAccessor()
+        public ManifestAccessor(IDatabaseAccessor databaseAccessor)
         {
-            // this.bungieApiService = new BungieApiService();
+            this.databaseAccessor = databaseAccessor;
+            this.manifestPath = GetManifestPath();
         }
 
-        public string LookupItem(uint itemHash)
+        public DestinyItem LookupItem(uint itemHash)
         {
             int itemId = ConvertHashToTableId(itemHash);
             string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
-            return ExecuteCommandOnManifestDatabase(commandText);
+            string json = TryExecuteCommand(commandText, manifestPath);
+            DestinyItem item = JsonConvert.DeserializeObject<DestinyItem>(json);
+            return item;
         }
 
-        public string LookupItemCategory(uint itemCategoryHash)
+        public DestinyItemCategory LookupItemCategory(uint itemCategoryHash)
         {
             int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
             string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
-            return ExecuteCommandOnManifestDatabase(commandText);
+            string json = TryExecuteCommand(commandText, manifestPath);
+            DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+            return itemCategory;
+        }
+
+        private string TryExecuteCommand(string commandText, string manifestPath)
+        {
+            try {
+                return databaseAccessor.ExecuteCommand(commandText, manifestPath);
+            } catch (Exception e) {
+                throw new EmissaryDataAccessException(e.Message);
+            }
         }
 
         private int ConvertHashToTableId(uint hash)
@@ -43,22 +58,22 @@ namespace Emissary
             return id;
         }
 
-        private string ExecuteCommandOnManifestDatabase(string commandText)
-        {
-            string dbPath = GetLocalManifestFilePath();
-            string queryResult = "";
-            using (SqliteConnection db = new SqliteConnection($"Filename={dbPath}")) {
-                db.Open();
-                SqliteCommand selectCommand = new SqliteCommand(commandText, db);
-                SqliteDataReader reader = selectCommand.ExecuteReader();
-                reader.Read();
-                queryResult = reader.GetString(0);
-                db.Close();
-            }
-            return queryResult;
-        }
+        // private string ExecuteCommandOnManifestDatabase(string commandText)
+        // {
+        //     string dbPath = GetLocalManifestFilePath();
+        //     string queryResult = "";
+        //     using (SqliteConnection db = new SqliteConnection($"Filename={dbPath}")) {
+        //         db.Open();
+        //         SqliteCommand selectCommand = new SqliteCommand(commandText, db);
+        //         SqliteDataReader reader = selectCommand.ExecuteReader();
+        //         reader.Read();
+        //         queryResult = reader.GetString(0);
+        //         db.Close();
+        //     }
+        //     return queryResult;
+        // }
 
-        private string GetLocalManifestFilePath()
+        private string GetManifestPath()
         {
             string workingDirectory = Environment.CurrentDirectory;
             string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;

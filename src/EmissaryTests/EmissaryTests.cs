@@ -103,13 +103,5 @@ namespace Emissary.Tests
         // }
 
 
-        private string ReadFile(string testFileName)
-        {
-            string testsDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
-            string jsonResponsesPath = Path.Combine(testsDirectory, "json-responses");
-            string filePath = Path.Combine(jsonResponsesPath, testFileName);
-            return File.ReadAllText(filePath);
-        }
-
     }
 }
