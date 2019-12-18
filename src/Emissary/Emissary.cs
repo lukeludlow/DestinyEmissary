@@ -54,11 +54,10 @@ namespace Emissary
         {
             Loadout currentlyEquipped = new Loadout();
             long characterId = GetMostRecentlyPlayedCharacter(membershipId);
-            List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
+            List<uint> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
 
-            foreach (UInt32 itemHash in itemHashes) {
-                string json = manifestAccessor.LookupItem(itemHash);
-                DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
+            foreach (uint itemHash in itemHashes) {
+                DestinyItem item = manifestAccessor.LookupItem(itemHash);
                 if (ItemIsKineticWeapon(item)) {
                     currentlyEquipped.KineticWeapon = new Weapon(item.DisplayProperties.Name, "Kinetic Weapon");
                 }
@@ -67,12 +66,13 @@ namespace Emissary
             return currentlyEquipped;
         }
 
-        private bool ItemIsKineticWeapon(DestinyInventoryItem item)
+        private bool ItemIsKineticWeapon(DestinyItem item)
         {
             bool itemIsWeapon = false;
-            foreach (UInt32 itemCategoryHash in item.ItemCategoryHashes) {
-                string json = manifestAccessor.LookupItemCategory(itemCategoryHash);
-                DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+            foreach (uint itemCategoryHash in item.ItemCategoryHashes) {
+                // string json = manifestAccessor.LookupItemCategory(itemCategoryHash);
+                // DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+                DestinyItemCategory itemCategory = manifestAccessor.LookupItemCategory(itemCategoryHash);
                 if (itemCategory.DisplayProperties.Name == "Kinetic Weapon") {
                     itemIsWeapon = true;
                     break;
@@ -99,7 +99,7 @@ namespace Emissary
             return mostRecentlyPlayedCharacter.CharacterId;
         }
 
-        public List<UInt32> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
+        public List<uint> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
         {
             // get-character-equipment.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
@@ -107,7 +107,7 @@ namespace Emissary
             string json = "";
             DestinyProfileCharacterEquipmentResponse response = JsonConvert.DeserializeObject<DestinyProfileCharacterEquipmentResponse>(json);
             DestinyInventoryComponent characterInventory = response.Response.CharacterEquipment.Data[characterId];
-            List<UInt32> itemHashes = new List<UInt32>();
+            List<uint> itemHashes = new List<uint>();
             foreach (DestinyItemComponent item in characterInventory.Items) {
                 itemHashes.Add(item.ItemHash);
             }
@@ -116,11 +116,12 @@ namespace Emissary
 
         public List<string> GetCharacterEquipmentNames(long membershipId, long characterId)
         {
-            List<UInt32> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
+            List<uint> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
             List<string> itemNames = new List<string>();
-            foreach (UInt32 itemHash in itemHashes) {
-                string json = manifestAccessor.LookupItem(itemHash);
-                DestinyInventoryItem item = JsonConvert.DeserializeObject<DestinyInventoryItem>(json);
+            foreach (uint itemHash in itemHashes) {
+                // string json = manifestAccessor.LookupItem(itemHash);
+                // DestinyItem item = JsonConvert.DeserializeObject<DestinyItem>(json);
+                DestinyItem item = manifestAccessor.LookupItem(itemHash);
                 itemNames.Add(item.DisplayProperties.Name);
             }
             return itemNames;

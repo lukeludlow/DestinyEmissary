@@ -9,5 +9,10 @@ namespace Emissary.Model
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        public DestinyDisplayPropertiesDefinition(string name)
+        {
+            this.Name = name;
+        }
     }
 }
