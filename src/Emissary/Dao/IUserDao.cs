@@ -7,8 +7,7 @@ namespace Emissary
     {
         IList<EmissaryUser> GetUsers();
         EmissaryUser GetUserByDiscordId(ulong discordId);
-        void AddUser(EmissaryUser emissaryUser); 
+        void AddOrUpdateUser(EmissaryUser emissaryUser); 
         void RemoveUser(ulong discordId);
-        void Save();
     }
 }

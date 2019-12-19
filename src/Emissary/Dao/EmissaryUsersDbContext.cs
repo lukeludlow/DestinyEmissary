@@ -8,6 +8,7 @@ namespace Emissary
 
         public EmissaryUsersDbContext()
         {
+            // for this constructor, the OnConfiguring method will be called to configure the database.
         }
 
         public EmissaryUsersDbContext(DbContextOptions<EmissaryUsersDbContext> options)
@@ -26,6 +27,8 @@ namespace Emissary
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // TODO figure out what the current path of the actual database is and set it here
+            // i.e. prod is ./src/data/emissary.db, dev is ../../../src/data/emissary.db
             if (!optionsBuilder.IsConfigured) {
                 // "DataSource={databasePath}  e.g. full path of src/data/user-info.db
                 optionsBuilder.UseSqlite("idk");
