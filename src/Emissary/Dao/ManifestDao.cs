@@ -44,7 +44,7 @@ namespace Emissary
             try {
                 return databaseAccessor.ExecuteCommand(commandText, manifestPath);
             } catch (Exception e) {
-                throw new EmissaryDataAccessException(e.Message);
+                throw new DataAccessException(e.Message);
             }
         }
 

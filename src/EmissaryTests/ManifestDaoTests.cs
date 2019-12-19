@@ -50,7 +50,7 @@ namespace EmissaryTests
             Mock<IDatabaseAccessor> mockDatabaseAccessor = new Mock<IDatabaseAccessor>();
             mockDatabaseAccessor.Setup(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$"))).Throws(new SqliteException("", 0));
             IManifestDao manifestAccessor = new ManifestDao(mockDatabaseAccessor.Object);
-            Assert.ThrowsException<EmissaryDataAccessException>(() => manifestAccessor.LookupItem(itemHash));
+            Assert.ThrowsException<DataAccessException>(() => manifestAccessor.LookupItem(itemHash));
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace EmissaryTests
             // Mock<IDatabaseAccessor> mockDatabaseAccessor = new Mock<IDatabaseAccessor>();
             // mockDatabaseAccessor.Setup(m => m.ExecuteCommand(It.IsAny<string>(), It.IsRegex(@".*\.manifest$"))).Throws(new SqliteException("", 0));
             // IManifestAccessor manifestAccessor = new ManifestAccessor(mockDatabaseAccessor.Object);
-            Assert.ThrowsException<EmissaryDataAccessException>(() => manifestAccessor.LookupItem(itemHash));
+            Assert.ThrowsException<DataAccessException>(() => manifestAccessor.LookupItem(itemHash));
         }
 
         // should i actually do this test? idk if it's helpful

@@ -4,6 +4,8 @@ namespace Emissary.Model
 {
     public class Loadout
     {
+        public string Name { get; set; }
+
         public Weapon KineticWeapon { get; set; }
         public Weapon EnergyWeapon { get; set; }
         public Weapon HeavyWeapon { get; set; }

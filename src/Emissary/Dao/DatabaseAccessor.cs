@@ -13,7 +13,7 @@ namespace Emissary
             try {
                 string queryResult = "";
                 if (!File.Exists(databasePath)) {
-                    throw new EmissaryDataAccessException("database file does not exist");
+                    throw new DataAccessException("database file does not exist");
                 }
                 using (SqliteConnection db = new SqliteConnection($"Filename={databasePath}")) {
                     db.Open();
@@ -25,12 +25,12 @@ namespace Emissary
                         db.Close();
                     } else {
                         db.Close();
-                        throw new EmissaryDataAccessException("0 rows returned");
+                        throw new DataAccessException("0 rows returned");
                     }
                 }
                 return queryResult;
             } catch (Exception e) {
-                throw new EmissaryDataAccessException(e.Message);
+                throw new DataAccessException(e.Message);
             }
         }
 
