@@ -7,6 +7,9 @@ config.json
 *.manifest 
 *.db 
 
+# code coverage output
+lcov.info
+
 
 # Created by https://www.gitignore.io/api/csharp,dotnetcore
 # Edit at https://www.gitignore.io/?templates=csharp,dotnetcore
