@@ -2,16 +2,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Emissary
 {
-    public class EmissaryUsersDbContext : DbContext
+    public class EmissaryDbContext : DbContext
     {
         public DbSet<EmissaryUser> Users { get; set; }
+        public DbSet<LoadoutDbEntity> Loadouts { get; set; }
 
-        public EmissaryUsersDbContext()
+        public EmissaryDbContext()
         {
             // for this constructor, the OnConfiguring method will be called to configure the database.
         }
 
-        public EmissaryUsersDbContext(DbContextOptions<EmissaryUsersDbContext> options)
+        public EmissaryDbContext(DbContextOptions<EmissaryDbContext> options)
             : base(options)
         {
         }
@@ -24,6 +25,11 @@ namespace Emissary
         //     string localDbFilePath = Path.Combine(dataDirectory, localDbFileName);
         //     return localDbFilePath;
         // }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<LoadoutDbEntity>().HasKey(l => new { l.DiscordID, l.Name });
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

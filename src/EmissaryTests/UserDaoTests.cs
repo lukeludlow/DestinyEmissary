@@ -18,18 +18,18 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     // create the schema in the database
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     Assert.AreEqual(1, dbContext.Users.Count());
                     Assert.AreEqual((ulong)69, dbContext.Users.Single().DiscordID);
                     Assert.AreEqual((long)420, dbContext.Users.Single().BungieID);
@@ -42,19 +42,19 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                     // this shouldn't throw
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     Assert.AreEqual(1, dbContext.Users.Count());
                     Assert.AreEqual((ulong)69, dbContext.Users.Single().DiscordID);
                     Assert.AreEqual((long)420, dbContext.Users.Single().BungieID);
@@ -67,18 +67,18 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                     userDao.AddOrUpdateUser(new EmissaryUser(69, -421));
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     Assert.AreEqual(1, dbContext.Users.Count());
                     Assert.AreEqual((ulong)69, dbContext.Users.Single().DiscordID);
                     Assert.AreEqual((long)-421, dbContext.Users.Single().BungieID);
@@ -91,13 +91,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     IList<EmissaryUser> users = userDao.GetUsers();
                     Assert.AreEqual(0, users.Count());
@@ -110,13 +110,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                     IList<EmissaryUser> users = userDao.GetUsers();
@@ -132,13 +132,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     // adding them in reverse order of keys, so i can make sure that the list comes out properly sorted
                     userDao.AddOrUpdateUser(new EmissaryUser(420, 420420));
@@ -158,13 +158,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     EmissaryUser foundUser = userDao.GetUserByDiscordId(69);
                     Assert.IsNull(foundUser);
@@ -177,13 +177,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     dbContext.Users.Add(new EmissaryUser(69, 420));
                     dbContext.Users.Add(new EmissaryUser(68, 419));
@@ -201,13 +201,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                     EmissaryUser foundUser = userDao.GetUserByDiscordId(69);
@@ -226,13 +226,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     Assert.AreEqual(0, dbContext.Users.Count());
                     // this shouldn't throw and shouldn't change the database
@@ -247,13 +247,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);
                     dbContext.Users.Add(new EmissaryUser(69, 420));
                     dbContext.Users.Add(new EmissaryUser(1, 1));
@@ -272,13 +272,13 @@ namespace EmissaryTests
         {
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
-                DbContextOptions<EmissaryUsersDbContext> options = new DbContextOptionsBuilder<EmissaryUsersDbContext>()
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
                     .UseSqlite(connection)
                     .Options;
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     dbContext.Database.EnsureCreated();
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     using (UserDao userDao = new UserDao(dbContext)) {
                         userDao.AddOrUpdateUser(new EmissaryUser(69, 420));
                     }
@@ -288,7 +288,7 @@ namespace EmissaryTests
                         disposable.Dispose();
                     }
                 }
-                using (EmissaryUsersDbContext dbContext = new EmissaryUsersDbContext(options)) {
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     Assert.AreEqual(1, dbContext.Users.Count());
                     Assert.AreEqual((ulong)69, dbContext.Users.Single().DiscordID);
                     Assert.AreEqual((long)420, dbContext.Users.Single().BungieID);

@@ -7,40 +7,40 @@ namespace Emissary
 {
     public class UserDao : IUserDao, IDisposable
     {
-        private EmissaryUsersDbContext context;
+        private EmissaryDbContext dbContext;
 
-        public UserDao(EmissaryUsersDbContext context)
+        public UserDao(EmissaryDbContext context)
         {
-            this.context = context;
+            this.dbContext = context;
         }
 
         public IList<EmissaryUser> GetUsers()
         {
-            return context.Users.ToList();
+            return dbContext.Users.ToList();
         }
 
         public EmissaryUser GetUserByDiscordId(ulong discordId)
         {
-            return context.Users.Find(discordId);
+            return dbContext.Users.Find(discordId);
         }
 
         public void AddOrUpdateUser(EmissaryUser user)
         {
-            EmissaryUser existingUser = context.Users.Where(u => u.DiscordID == user.DiscordID).AsQueryable().FirstOrDefault();
+            EmissaryUser existingUser = dbContext.Users.Where(u => u.DiscordID == user.DiscordID).AsQueryable().FirstOrDefault();
             if (existingUser == null) {
-                context.Users.Add(user);
+                dbContext.Users.Add(user);
             } else {
-                context.Entry(existingUser).CurrentValues.SetValues(user);
+                dbContext.Entry(existingUser).CurrentValues.SetValues(user);
             }
-            context.SaveChanges();
+            dbContext.SaveChanges();
         }
 
         public void RemoveUser(ulong discordId)
         {
-            EmissaryUser user = context.Users.Find(discordId);
+            EmissaryUser user = dbContext.Users.Find(discordId);
             if (user != null) {
-                context.Users.Remove(user);
-                context.SaveChanges();
+                dbContext.Users.Remove(user);
+                dbContext.SaveChanges();
             }
         }
 
@@ -50,7 +50,7 @@ namespace Emissary
         {
             if (this.disposed) {
                 if (disposing) {
-                    context.Dispose();
+                    dbContext.Dispose();
                 }
             }
             this.disposed = true;

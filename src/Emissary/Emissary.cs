@@ -52,7 +52,7 @@ namespace Emissary
 
         public Loadout GetCurrentlyEquipped(long membershipId)
         {
-            Loadout currentlyEquipped = new Loadout();
+            Loadout currentlyEquipped = null;
             long characterId = GetMostRecentlyPlayedCharacter(membershipId);
             List<uint> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
 
