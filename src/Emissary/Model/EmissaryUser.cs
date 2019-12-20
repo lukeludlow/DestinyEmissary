@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Emissary.Model;
 
 namespace Emissary
 {
