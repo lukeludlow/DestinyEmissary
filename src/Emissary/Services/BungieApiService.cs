@@ -1,19 +1,20 @@
 using System;
 using System.IO;
 using System.Net.Http;
-using Emissary.Model;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Emissary
 {
-    internal class BungieApiService : IBungieApiService
+    public class BungieApiService : IBungieApiService
     {
         private HttpClient httpClient;
 
-        public BungieApiService()
+        public BungieApiService(HttpClient httpClient)
         {
-            this.httpClient = new HttpClient();
-            this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
+            this.httpClient = httpClient;
+            // this.httpClient = new HttpClient();
+            // this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
         }
 
         public DestinyProfileCharactersResponse GetCharacters(int membershipType, long bungieId)
@@ -28,7 +29,10 @@ namespace Emissary
 
         public SearchDestinyPlayerResponse SearchDestinyPlayer(int membershipType, string displayName)
         {
-            throw new NotImplementedException();
+            string requestPath = $"SearchDestinyPlayer/{membershipType}/{displayName}";
+            string jsonResponse = Get(requestPath);
+            SearchDestinyPlayerResponse response = JsonConvert.DeserializeObject<SearchDestinyPlayerResponse>(jsonResponse);
+            return response;
         }
 
 
@@ -41,6 +45,7 @@ namespace Emissary
             return json;
         }
 
+        // TODO refactor this
         public Stream SendRequestAndReturnStream(string requestUrl)
         {
             // very much blocking. might want to change this later since it's a kinda big file.

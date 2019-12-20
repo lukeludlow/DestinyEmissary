@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Emissary.Common
 {
@@ -13,9 +14,9 @@ namespace Emissary.Common
         /// name of the currently equipped DestinyEmissary loadout, it just shows the items currently on the destiny
         /// character. 
         /// </summary>
-        string CurrentlyEquipped(ulong discordId);
+        Loadout CurrentlyEquipped(ulong discordId);
 
-        string ListLoadouts(ulong discordId);
+        IList<Loadout> ListLoadouts(ulong discordId);
 
         string EquipLoadout(ulong discordId, string loadoutName);
 

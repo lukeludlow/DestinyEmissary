@@ -1,7 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Emissary.Common;
-using Emissary.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,12 +12,12 @@ namespace Emissary
         private IBungieApiService bungieApiService;
         private IManifestDao manifestAccessor;
 
-        public string CurrentlyEquipped(ulong discordId)
+        public Loadout CurrentlyEquipped(ulong discordId)
         {
             throw new NotImplementedException();
         }
 
-        public string ListLoadouts(ulong discordId)
+        public IList<Loadout> ListLoadouts(ulong discordId)
         {
             throw new NotImplementedException();
         }
@@ -50,7 +49,7 @@ namespace Emissary
             this.manifestAccessor = manifestAccessor;
         }
 
-        public Loadout GetCurrentlyEquipped(long membershipId)
+        private Loadout GetCurrentlyEquipped(long membershipId)
         {
             Loadout currentlyEquipped = null;
             long characterId = GetMostRecentlyPlayedCharacter(membershipId);
@@ -82,7 +81,7 @@ namespace Emissary
         }
 
 
-        public long GetMostRecentlyPlayedCharacter(long membershipId)
+        private long GetMostRecentlyPlayedCharacter(long membershipId)
         {
             // get-characters-personal.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=200";
@@ -99,7 +98,7 @@ namespace Emissary
             return mostRecentlyPlayedCharacter.CharacterId;
         }
 
-        public List<uint> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
+        private List<uint> GetCharacterEquipmentAsItemHashes(long membershipId, long characterId)
         {
             // get-character-equipment.json
             string requestUrl = $"https://www.bungie.net/Platform/Destiny2/3/Profile/{membershipId}/?components=205";
@@ -114,7 +113,7 @@ namespace Emissary
             return itemHashes;
         }
 
-        public List<string> GetCharacterEquipmentNames(long membershipId, long characterId)
+        private List<string> GetCharacterEquipmentNames(long membershipId, long characterId)
         {
             List<uint> itemHashes = GetCharacterEquipmentAsItemHashes(membershipId, characterId);
             List<string> itemNames = new List<string>();
@@ -138,7 +137,7 @@ namespace Emissary
         }
 
 
-        public bool TrySearchDestinyPlayer(string displayName, out long membershipId)
+        private bool TrySearchDestinyPlayer(string displayName, out long membershipId)
         {
             // search-destiny-player.json
             int membershipType = BungieMembershipType.All;
