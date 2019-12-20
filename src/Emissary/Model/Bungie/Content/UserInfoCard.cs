@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Emissary.Model
+namespace Emissary
 {
     /// <summary>
 	/// https://bungie-net.github.io/multi/schema_User-UserInfoCard.html#schema_User-UserInfoCard

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Emissary.Model;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

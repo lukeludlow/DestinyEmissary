@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Emissary.Model
+namespace Emissary
 {
     /// <summary>
     /// https://bungie-net.github.io/multi/schema_Destiny-Definitions-Common-DestinyDisplayPropertiesDefinition.html#schema_Destiny-Definitions-Common-DestinyDisplayPropertiesDefinition

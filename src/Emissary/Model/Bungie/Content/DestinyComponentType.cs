@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Emissary.Model
+namespace Emissary
 {
     /// <summary>
     /// Represents the possible components that can be returned from Destiny "Get" calls such as GetProfile,

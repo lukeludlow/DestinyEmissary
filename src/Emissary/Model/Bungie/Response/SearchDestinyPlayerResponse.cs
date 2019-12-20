@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Emissary.Model
+namespace Emissary
 {
     /// <summary>
     /// https://bungie-net.github.io/multi/operation_get_Destiny2-SearchDestinyPlayer.html#operation_get_Destiny2-SearchDestinyPlayer

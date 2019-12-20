@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Emissary.Model
+namespace Emissary
 {
     /// <summary>
     /// mobile manifest entity!

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Emissary.Model
+namespace Emissary
 {
     public class DestinyItemCategory
     {

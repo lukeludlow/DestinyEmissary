@@ -1,5 +1,3 @@
-using Emissary.Model;
-
 namespace Emissary
 {
     public interface IManifestDao

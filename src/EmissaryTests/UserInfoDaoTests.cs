@@ -4,7 +4,6 @@ using Moq;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Emissary.Model;
 
 namespace EmissaryTests
 {
