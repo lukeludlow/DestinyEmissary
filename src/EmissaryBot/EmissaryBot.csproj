@@ -6,6 +6,7 @@
 		<UserSecretsId>f9db4c71-bd31-42f0-8b5a-72dad71ac30a</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Certes" Version="2.3.3" />
 		<PackageReference Include="Discord.Net" Version="2.1.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />

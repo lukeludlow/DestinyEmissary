@@ -5,7 +5,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 
-namespace Emissary.Bot
+namespace EmissaryBot
 {
     public class CommandHandler
     {

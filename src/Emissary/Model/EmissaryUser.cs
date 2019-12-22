@@ -8,6 +8,7 @@ namespace Emissary
         [Key]
         public ulong DiscordID { get; set; }
         public long BungieID { get; set; }
+        // bungie membership type
 
         public EmissaryUser()
         {

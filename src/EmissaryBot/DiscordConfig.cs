@@ -1,4 +1,4 @@
-namespace Emissary.Bot
+namespace EmissaryBot
 {
     public class DiscordConfig
     {

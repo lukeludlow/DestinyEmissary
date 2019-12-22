@@ -6,8 +6,10 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Discord.Commands;
+using System.Net.Http;
+using System.Net;
 
-namespace Emissary.Bot
+namespace EmissaryBot
 {
     public class Startup
     {
@@ -33,6 +35,7 @@ namespace Emissary.Bot
             IServiceProvider provider = services.BuildServiceProvider();
             provider.GetRequiredService<LogService>();  
             provider.GetRequiredService<CommandHandler>();  
+            provider.GetRequiredService<AuthorizationRedirectService>();
 
             // start the startup service which actually runs the bot
             await provider.GetRequiredService<StartupService>().StartAsync();  
@@ -44,8 +47,10 @@ namespace Emissary.Bot
         {
             services.AddSingleton(new DiscordSocketClient())
                     .AddSingleton(new CommandService())
-                    .AddSingleton<CommandHandler>()
+                    .AddSingleton(new HttpListener())  // TODO config httplistener for authorization redirect service
                     .AddSingleton<LogService>()
+                    .AddSingleton<CommandHandler>()
+                    .AddSingleton<AuthorizationRedirectService>()
                     .AddSingleton<StartupService>()
                     .AddSingleton(Configuration);
         }
