@@ -11,6 +11,10 @@ using Discord;
 
 namespace EmissaryBot
 {
+    /// <summary>
+    /// i expose a public secure https address through my azure cloud vm,
+    /// then i have an nginx reverse proxy that redirects the request to a localhost httplistener 
+    /// </summary>
     public class AuthorizationRedirectService
     {
         private readonly HttpListener httpListener;
@@ -55,7 +59,7 @@ namespace EmissaryBot
                 // then Emissary handles all the rest (POST request and storing tokens and stuff)
 
                 await log.LogAsync(new LogMessage(LogSeverity.Verbose, "HttpListenerService", "TODO passing authorization code to emissary auth service"));
-                
+
                 // TODO read the state parameter!!! i will set the state param to be the user's discord id
                 // request.QueryString["code"]
                 // request.QueryString["state"]  (the user's discord id)

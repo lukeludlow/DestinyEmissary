@@ -49,11 +49,9 @@ namespace Emissary
 
         private int ConvertHashToTableId(uint hash)
         {
+            // itemHash is an unsigned 32bit integer, but SQLite is interpreting the value as a signed int.
+            // so just cast it to a signed int and then use that value as the id.
             int id = (int)hash;
-            // TODO what does this do???
-            // if ((id & (1 << (32 - 1))) != 0) {
-            // id = id - (1 << 32);
-            // }
             return id;
         }
 

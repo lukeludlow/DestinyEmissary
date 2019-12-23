@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 
 namespace Emissary
 {
@@ -7,7 +6,7 @@ namespace Emissary
     /// Represents the possible components that can be returned from Destiny "Get" calls such as GetProfile,
     /// GetCharacter, GetVendor etc... 
     /// https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html#schema_Destiny-DestinyComponentType
-    public static class DestinyComponentType
+    public static class DestinyRequestComponentType
     {
         public static readonly int None = 0;
         public static readonly int Profiles = 100;

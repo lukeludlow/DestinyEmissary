@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Emissary
@@ -6,18 +5,9 @@ namespace Emissary
     public class EmissaryUser
     {
         [Key]
-        public ulong DiscordID { get; set; }
-        public long BungieID { get; set; }
-        // bungie membership type
-
-        public EmissaryUser()
-        {
-        }
-
-        public EmissaryUser(ulong discordId, long bungieId)
-        {
-            this.DiscordID = discordId;
-            this.BungieID = bungieId;
-        }
+        public ulong DiscordId { get; set; }
+        public string BungieAccessToken { get; set; }
+        public int DestinyMembershipType { get; set; }
+        public long DestinyMembershipId { get; set; }
     }
 }
