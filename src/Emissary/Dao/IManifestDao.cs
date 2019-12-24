@@ -3,6 +3,6 @@ namespace Emissary
     public interface IManifestDao
     {
         DestinyItem LookupItem(uint itemHash);
-        DestinyItemCategory LookupItemCategory(uint itemCategoryHash);
+        // DestinyItemCategory LookupItemCategory(uint itemCategoryHash);
     }
 }

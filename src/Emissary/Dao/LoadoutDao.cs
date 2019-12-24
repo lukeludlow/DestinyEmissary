@@ -16,43 +16,47 @@ namespace Emissary
 
         public IList<Loadout> GetAllLoadoutsForUser(ulong discordId)
         {
-            IList<Loadout> loadouts = dbContext.Loadouts.Where(l => l.DiscordID == discordId)
-                                                            .Select(l => l.ToLoadout())
-                                                            .ToList();
-            return loadouts;
+            // IList<Loadout> loadouts = dbContext.Loadouts.Where(l => l.DiscordID == discordId)
+            //                                                 .Select(l => l.ToLoadout())
+            //                                                 .ToList();
+            // return loadouts;
+            throw new NotImplementedException();
         }
 
         public Loadout GetLoadout(ulong discordId, string loadoutName)
         {
-            LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
-            Loadout foundLoadout;
-            if (loadoutEntity != null) {
-                foundLoadout = loadoutEntity.ToLoadout();
-            } else {
-                foundLoadout = null;
-            }
-            return foundLoadout;
+            // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
+            // Loadout foundLoadout;
+            // if (loadoutEntity != null) {
+            //     foundLoadout = loadoutEntity.ToLoadout();
+            // } else {
+            //     foundLoadout = null;
+            // }
+            // return foundLoadout;
+            throw new NotImplementedException();
         }
 
         public void AddOrUpdateLoadout(Loadout loadout)
         {
-            LoadoutDbEntity loadoutEntity = new LoadoutDbEntity(loadout);
-            LoadoutDbEntity existingLoadout = dbContext.Loadouts.Where(l => l.Name == loadoutEntity.Name && l.DiscordID == loadoutEntity.DiscordID).AsQueryable().FirstOrDefault();
-            if (existingLoadout == null) {
-                dbContext.Loadouts.Add(loadoutEntity);
-            } else {
-                dbContext.Entry(existingLoadout).CurrentValues.SetValues(loadoutEntity);
-            }
-            dbContext.SaveChanges();
+            // LoadoutDbEntity loadoutEntity = new LoadoutDbEntity(loadout);
+            // LoadoutDbEntity existingLoadout = dbContext.Loadouts.Where(l => l.Name == loadoutEntity.Name && l.DiscordID == loadoutEntity.DiscordID).AsQueryable().FirstOrDefault();
+            // if (existingLoadout == null) {
+            //     dbContext.Loadouts.Add(loadoutEntity);
+            // } else {
+            //     dbContext.Entry(existingLoadout).CurrentValues.SetValues(loadoutEntity);
+            // }
+            // dbContext.SaveChanges();
+            throw new NotImplementedException();
         }
 
         public void RemoveLoadout(ulong discordId, string loadoutName)
         {
-            LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
-            if (loadoutEntity != null) {
-                dbContext.Loadouts.Remove(loadoutEntity);
-                dbContext.SaveChanges();
-            }
+            // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
+            // if (loadoutEntity != null) {
+            //     dbContext.Loadouts.Remove(loadoutEntity);
+            //     dbContext.SaveChanges();
+            // }
+            throw new NotImplementedException();
         }
 
 

@@ -5,7 +5,7 @@ namespace Emissary
     public class EmissaryDbContext : DbContext
     {
         public DbSet<EmissaryUser> Users { get; set; }
-        public DbSet<LoadoutDbEntity> Loadouts { get; set; }
+        public DbSet<Loadout> Loadouts { get; set; }
 
         public EmissaryDbContext()
         {
@@ -28,7 +28,7 @@ namespace Emissary
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LoadoutDbEntity>().HasKey(l => new { l.DiscordID, l.Name });
+            modelBuilder.Entity<Loadout>().HasKey(l => new { l.DiscordId, l.DestinyCharacterId, l.LoadoutName });
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

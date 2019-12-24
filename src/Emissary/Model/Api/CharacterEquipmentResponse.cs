@@ -5,7 +5,7 @@ namespace Emissary
 {
     public class CharacterEquipmentResponse
     {
-
+        
 
         public static CharacterEquipmentResponse BuildFromHttpResponse(HttpResponseMessage response)
         {

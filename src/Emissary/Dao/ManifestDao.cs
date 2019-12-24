@@ -29,14 +29,14 @@ namespace Emissary
             return item;
         }
 
-        public DestinyItemCategory LookupItemCategory(uint itemCategoryHash)
-        {
-            int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
-            string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
-            string json = TryExecuteCommand(commandText, manifestPath);
-            DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
-            return itemCategory;
-        }
+        // public DestinyItemCategory LookupItemCategory(uint itemCategoryHash)
+        // {
+        //     int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
+        //     string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
+        //     string json = TryExecuteCommand(commandText, manifestPath);
+        //     DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
+        //     return itemCategory;
+        // }
 
         private string TryExecuteCommand(string commandText, string manifestPath)
         {

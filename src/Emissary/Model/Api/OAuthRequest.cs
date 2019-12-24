@@ -15,10 +15,5 @@ namespace Emissary
             this.ClientId = clientId;
             this.ClientSecret = clientSecret;
         }
-
-        public HttpRequestMessage ToHttpRequest()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
