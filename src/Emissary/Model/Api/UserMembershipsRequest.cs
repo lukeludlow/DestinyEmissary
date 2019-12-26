@@ -11,10 +11,5 @@ namespace Emissary
         {
             this.AccessToken = accessToken;
         }
-
-        public HttpRequestMessage ToHttpRequest()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

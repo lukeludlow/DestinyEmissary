@@ -1,25 +1,26 @@
 using System;
 using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace Emissary
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class EquipItemsRequest
     {
         public string AccessToken { get; set; }
+        [JsonProperty("membershipType")]
         public int MembershipType { get; set; }
+        [JsonProperty("characterId")]
         public long DestinyCharacterId { get; set; }
+        [JsonProperty("itemIds")]
         public long[] ItemInstanceIds { get; set; }
 
-        public EquipItemsRequest(string accessToken, int membershipType, long destinyCharacterId)
+        public EquipItemsRequest(string accessToken, int membershipType, long destinyCharacterId, long[] itemInstanceIds)
         {
             this.AccessToken = accessToken;
             this.MembershipType = membershipType;
             this.DestinyCharacterId = destinyCharacterId;
-        }
-
-        public HttpRequestMessage ToHttpRequest()
-        {
-            throw new NotImplementedException();
+            this.ItemInstanceIds = itemInstanceIds;
         }
     }
 }

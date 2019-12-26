@@ -6,19 +6,14 @@ namespace Emissary
     public class CharacterEquipmentRequest
     {
         public int MembershipType { get; set; }
-        public long DestinyMembershipId { get; set; }
+        public long MembershipId { get; set; }
         public long DestinyCharacterId { get; set; }
 
-        public CharacterEquipmentRequest(int membershipType, long destinyMembershipId, long destinyCharacterId)
+        public CharacterEquipmentRequest(int membershipType, long membershipId, long destinyCharacterId)
         {
             this.MembershipType = membershipType;
-            this.DestinyMembershipId = destinyMembershipId;
+            this.MembershipId = membershipId;
             this.DestinyCharacterId = destinyCharacterId;
-        }
-
-        public HttpRequestMessage ToHttpRequest()
-        {
-            throw new NotImplementedException();
         }
     }
 }

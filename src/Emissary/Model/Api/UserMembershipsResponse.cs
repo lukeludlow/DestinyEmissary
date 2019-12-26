@@ -1,15 +1,13 @@
 using System;
 using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace Emissary
 {
+    [JsonConverter(typeof(JsonPathConverter))]
     public class UserMembershipsResponse
     {
-
-
-        public static UserMembershipsResponse BuildFromHttpResponse(HttpResponseMessage response)
-        {
-            throw new NotImplementedException();
-        }
+        [JsonProperty("Response.destinyMemberships")]
+        public DestinyMembership[] DestinyMemberships { get; set; }
     }
 }

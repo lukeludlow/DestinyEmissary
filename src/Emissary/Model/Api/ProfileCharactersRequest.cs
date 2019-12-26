@@ -13,10 +13,5 @@ namespace Emissary
             this.MembershipType = membershipType;
             this.DestinyMembershipId = destinyMembershipId;
         }
-
-        public HttpRequestMessage ToHttpRequest()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
