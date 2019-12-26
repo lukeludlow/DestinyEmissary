@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.Data.Sqlite;
 
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class DatabaseAccessor : IDatabaseAccessor
     {

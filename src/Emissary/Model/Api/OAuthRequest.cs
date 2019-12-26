@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class OAuthRequest
     {

@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Emissary;
+using EmissaryCore;
 using System.Linq;
 using System;
 using System.IO;

@@ -1,4 +1,4 @@
-namespace Emissary
+namespace EmissaryCore
 {
     public class Loadout
     {

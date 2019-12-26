@@ -1,6 +1,6 @@
 using System;
 
-namespace Emissary
+namespace EmissaryCore
 {
     /// <summary>
     /// Represents the possible components that can be returned from Destiny "Get" calls such as GetProfile,

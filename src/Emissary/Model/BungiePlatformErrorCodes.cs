@@ -1,4 +1,4 @@
-namespace Emissary
+namespace EmissaryCore
 {
     /// <summary>
 	/// https://bungie-net.github.io/multi/schema_Exceptions-PlatformErrorCodes.html#schema_Exceptions-PlatformErrorCodes

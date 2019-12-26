@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace Emissary
+namespace EmissaryCore
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class EquipItemsRequest

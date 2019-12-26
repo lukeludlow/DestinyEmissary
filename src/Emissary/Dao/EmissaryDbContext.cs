@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class EmissaryDbContext : DbContext
     {

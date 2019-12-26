@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class DestinyCharacter
     {

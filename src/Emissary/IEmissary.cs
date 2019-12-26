@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Emissary.Common
+namespace EmissaryCore.Common
 {
     /// <summary>
     /// this is the main interface that allows the discord bot to call the actual Destiny Emissary logic. 

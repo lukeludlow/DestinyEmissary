@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace Emissary
+namespace EmissaryCore
 {
     [JsonConverter(typeof(JsonPathConverter))]
     public class CharacterEquipmentResponse

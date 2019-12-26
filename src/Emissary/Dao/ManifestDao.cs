@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Data.Sqlite;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class ManifestDao : IManifestDao
     {

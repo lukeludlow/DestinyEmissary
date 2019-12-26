@@ -1,6 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Emissary;
+using EmissaryCore;
 using Moq;
 using System.Net.Http;
 using Moq.Protected;

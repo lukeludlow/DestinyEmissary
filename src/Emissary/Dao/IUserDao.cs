@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public interface IUserDao : IDisposable
     {

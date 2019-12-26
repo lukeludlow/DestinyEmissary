@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public static class BungieMembershipType
     {

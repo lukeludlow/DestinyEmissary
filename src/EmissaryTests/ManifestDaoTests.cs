@@ -1,6 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Emissary;
+using EmissaryCore;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;

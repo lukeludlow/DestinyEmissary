@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class EmissaryUser
     {

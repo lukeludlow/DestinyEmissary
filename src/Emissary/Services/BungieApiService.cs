@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class BungieApiService : IBungieApiService
     {

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class DestinyMembership
     {

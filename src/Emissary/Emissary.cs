@@ -1,10 +1,10 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Emissary.Common;
+using EmissaryCore.Common;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Emissary
+namespace EmissaryCore
 {
     // note: discord IDs are UInt64 (ulong). bungie IDs are Int64 (long).
     public class Emissary : IEmissary

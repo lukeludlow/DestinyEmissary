@@ -1,6 +1,6 @@
 using System;
 
-namespace Emissary
+namespace EmissaryCore
 {
     public class Secrets
     {

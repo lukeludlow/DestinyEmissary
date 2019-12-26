@@ -1,7 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Emissary;
-using Emissary.Common;
+using EmissaryCore;
+using EmissaryCore.Common;
 using System.Collections.Generic;
 using System.IO;
 using Moq;
