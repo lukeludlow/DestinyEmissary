@@ -44,6 +44,12 @@ namespace EmissaryBot
             bool runServer = true;
             while (runServer) {
                 HttpListenerContext context = await httpListener.GetContextAsync();
+                // by default, most browsers given a URL would make at least two calls. 
+                // one call to the request URL and the other to favicon.ico.
+                // so we need to ignore that second call for the favicon. 
+                if (context.Request.Url.OriginalString.Contains("favicon.ico")) {
+                    return;
+                }
                 LogRequestInfo(context.Request);
                 WriteResponse(context.Response);
 
