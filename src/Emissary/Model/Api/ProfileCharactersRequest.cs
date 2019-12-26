@@ -6,12 +6,12 @@ namespace EmissaryCore
     public class ProfileCharactersRequest
     {
         public int MembershipType { get; set; }
-        public long DestinyMembershipId { get; set; }
+        public long DestinyProfileId { get; set; }
 
-        public ProfileCharactersRequest(int membershipType, long destinyMembershipId)
+        public ProfileCharactersRequest(int membershipType, long destinyProfileId)
         {
             this.MembershipType = membershipType;
-            this.DestinyMembershipId = destinyMembershipId;
+            this.DestinyProfileId = destinyProfileId;
         }
     }
 }

@@ -64,7 +64,7 @@ namespace EmissaryCore
         {
             HttpRequestMessage request = new HttpRequestMessage();
             request.Method = HttpMethod.Get;
-            request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{charactersRequest.MembershipType}/Profile/{charactersRequest.DestinyMembershipId}/?components=200");
+            request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{charactersRequest.MembershipType}/Profile/{charactersRequest.DestinyProfileId}/?components=200");
             request.Headers.Add("X-API-KEY", bungieApiKey);
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.IsSuccessStatusCode) {
@@ -83,13 +83,13 @@ namespace EmissaryCore
         {
             HttpRequestMessage request = new HttpRequestMessage();
             request.Method = HttpMethod.Get;
-            request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{equipmentRequest.MembershipType}/Profile/{equipmentRequest.MembershipId}/Character/{equipmentRequest.DestinyCharacterId}/?components=205");
+            request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{equipmentRequest.DestinyMembershipType}/Profile/{equipmentRequest.DestinyProfileId}/Character/{equipmentRequest.DestinyCharacterId}/?components=205");
             request.Headers.Add("X-API-KEY", bungieApiKey);
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.IsSuccessStatusCode) {
                 string json = response.Content.ReadAsStringAsync().Result;
                 CharacterEquipmentResponse equipmentResponse = JsonConvert.DeserializeObject<CharacterEquipmentResponse>(json);
-                if (equipmentResponse == null || equipmentResponse.Items == null || equipmentResponse.Items.Length <= 0) {
+                if (equipmentResponse == null || equipmentResponse.Items == null || equipmentResponse.Items.Count <= 0) {
                     throw new BungieApiException("character not found: Account exists but could not get equipment for the given character.");
                 }
                 return equipmentResponse;

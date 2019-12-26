@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
 
@@ -8,6 +9,6 @@ namespace EmissaryCore
     public class UserMembershipsResponse
     {
         [JsonProperty("Response.destinyMemberships")]
-        public DestinyMembership[] DestinyMemberships { get; set; }
+        public IList<DestinyMembership> DestinyMemberships { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
 
@@ -8,6 +9,16 @@ namespace EmissaryCore
     public class CharacterEquipmentResponse
     {
         [JsonProperty("Response.equipment.data.items")]
-        public DestinyGenericItem[] Items { get; set; }
+        public IList<DestinyGenericItem> Items { get; set; }
+
+        public CharacterEquipmentResponse(DestinyGenericItem[] items)
+        {
+            this.Items = items;
+        }
+
+        public CharacterEquipmentResponse()
+        {
+            this.Items = new DestinyGenericItem[] { };
+        }
     }
 }

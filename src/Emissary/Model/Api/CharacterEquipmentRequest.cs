@@ -5,14 +5,14 @@ namespace EmissaryCore
 {
     public class CharacterEquipmentRequest
     {
-        public int MembershipType { get; set; }
-        public long MembershipId { get; set; }
+        public int DestinyMembershipType { get; set; }
+        public long DestinyProfileId { get; set; }
         public long DestinyCharacterId { get; set; }
 
-        public CharacterEquipmentRequest(int membershipType, long membershipId, long destinyCharacterId)
+        public CharacterEquipmentRequest(int destinyMembershipType, long destinyProfileId, long destinyCharacterId)
         {
-            this.MembershipType = membershipType;
-            this.MembershipId = membershipId;
+            this.DestinyMembershipType = destinyMembershipType;
+            this.DestinyProfileId = destinyProfileId;
             this.DestinyCharacterId = destinyCharacterId;
         }
     }

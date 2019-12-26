@@ -6,8 +6,8 @@ namespace EmissaryCore
     {
         [Key]
         public ulong DiscordId { get; set; }
-        public string BungieAccessToken { get; set; }
+        public long DestinyProfileId { get; set; }
         public int DestinyMembershipType { get; set; }
-        public long DestinyMembershipId { get; set; }
+        public string BungieAccessToken { get; set; }
     }
 }

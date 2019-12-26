@@ -10,8 +10,20 @@ namespace EmissaryCore
         [JsonProperty("dateLastPlayed")]
         public DateTimeOffset DateLastPlayed { get; set; }
         [JsonProperty("membershipId")]
-        public long MembershipId { get; set; }
+        public long DestinyProfileId { get; set; }
         [JsonProperty("membershipType")]
-        public int MembershipType { get; set; }
+        public int DestinyMembershipType { get; set; }
+
+        public DestinyCharacter(long characterId, DateTimeOffset dateLastPlayed, long destinyProfileId, int destinyMembershipType)
+        {
+            this.CharacterId = characterId;
+            this.DateLastPlayed = dateLastPlayed;
+            this.DestinyProfileId = destinyProfileId;
+            this.DestinyMembershipType = destinyMembershipType;
+        }
+
+        public DestinyCharacter()
+        {
+        }
     }
 }

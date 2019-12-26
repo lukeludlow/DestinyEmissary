@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
 
@@ -8,7 +9,7 @@ namespace EmissaryCore
     public class EquipItemsResponse
     {
         [JsonProperty("Response.equipResults")]
-        public EquipItemResult[] EquipResults { get; set; }
+        public IList<EquipItemResult> EquipResults { get; set; }
     }
 
     public class EquipItemResult

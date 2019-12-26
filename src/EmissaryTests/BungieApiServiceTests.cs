@@ -127,7 +127,7 @@ namespace EmissaryTests
             // act
             UserMembershipsResponse actual = bungieApiService.GetMembershipsForUser(request);
             // assert
-            Assert.AreEqual(2, actual.DestinyMemberships.Length);
+            Assert.AreEqual(2, actual.DestinyMemberships.Count);
             Assert.AreEqual("anime8094", actual.DestinyMemberships[0].DisplayName);
             Assert.AreEqual(4611686018497175745, actual.DestinyMemberships[0].DestinyMembershipId);
             Assert.AreEqual(1, actual.DestinyMemberships[0].MembershipType);
@@ -202,8 +202,8 @@ namespace EmissaryTests
             DestinyCharacter expectedCharacter = new DestinyCharacter();
             expectedCharacter.CharacterId = 2305843009504575107;
             expectedCharacter.DateLastPlayed = DateTimeOffset.Parse("2019-12-24T22:40:31Z");
-            expectedCharacter.MembershipId = 4611686018467260757;
-            expectedCharacter.MembershipType = 3;
+            expectedCharacter.DestinyProfileId = 4611686018467260757;
+            expectedCharacter.DestinyMembershipType = 3;
 
             ProfileCharactersRequest request = new ProfileCharactersRequest(membershipType, destinyMembershipId);
             // act
@@ -214,8 +214,8 @@ namespace EmissaryTests
             DestinyCharacter actualCharacter = actual.Characters[expectedCharacter.CharacterId];
             Assert.AreEqual(expectedCharacter.CharacterId, actualCharacter.CharacterId);
             Assert.AreEqual(expectedCharacter.DateLastPlayed, actualCharacter.DateLastPlayed);
-            Assert.AreEqual(expectedCharacter.MembershipId, actualCharacter.MembershipId);
-            Assert.AreEqual(expectedCharacter.MembershipType, actualCharacter.MembershipType);
+            Assert.AreEqual(expectedCharacter.DestinyProfileId, actualCharacter.DestinyProfileId);
+            Assert.AreEqual(expectedCharacter.DestinyMembershipType, actualCharacter.DestinyMembershipType);
         }
 
         // on my account, i have cross save enabled. so when i search for my memberships,
@@ -287,7 +287,7 @@ namespace EmissaryTests
             // act
             CharacterEquipmentResponse actual = bungieApiService.GetCharacterEquipment(request);
             // assert
-            Assert.AreEqual(17, actual.Items.Length);
+            Assert.AreEqual(17, actual.Items.Count);
             Assert.IsTrue(actual.Items.All(item => item.ItemHash != 0 && item.ItemInstanceId != 0));
         }
 
@@ -433,7 +433,7 @@ namespace EmissaryTests
             BungieApiService bungieApiService = new BungieApiService(httpClient);
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, new long[] { recluseItemInstanceId });
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(1, actual.EquipResults.Length);
+            Assert.AreEqual(1, actual.EquipResults.Count);
             Assert.AreEqual(BungiePlatformErrorCodes.Success, actual.EquipResults[0].EquipStatus);
         }
 
@@ -505,7 +505,7 @@ namespace EmissaryTests
             };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(17, actual.EquipResults.Length);
+            Assert.AreEqual(17, actual.EquipResults.Count);
             Assert.IsTrue(actual.EquipResults.All(r => r.EquipStatus == BungiePlatformErrorCodes.Success));
         }
 
@@ -539,7 +539,7 @@ namespace EmissaryTests
             BungieApiService bungieApiService = new BungieApiService(httpClient);
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, new long[] { });
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(0, actual.EquipResults.Length);
+            Assert.AreEqual(0, actual.EquipResults.Count);
         }
 
         [TestMethod]
@@ -575,7 +575,7 @@ namespace EmissaryTests
             long[] itemsToEquip = new long[] { recluseItemInstanceId, recluseItemInstanceId, recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(3, actual.EquipResults.Length);
+            Assert.AreEqual(3, actual.EquipResults.Count);
         }
 
         [TestMethod]
@@ -612,7 +612,7 @@ namespace EmissaryTests
             long[] itemsToEquip = new long[] { invalidItemInstanceId, recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(2, actual.EquipResults.Length);
+            Assert.AreEqual(2, actual.EquipResults.Count);
             Assert.AreEqual(69, actual.EquipResults[0].ItemInstanceId);
             Assert.AreEqual(BungiePlatformErrorCodes.DestinyItemNotFound, actual.EquipResults[0].EquipStatus);
             Assert.AreEqual(recluseItemInstanceId, actual.EquipResults[1].ItemInstanceId);
@@ -653,7 +653,7 @@ namespace EmissaryTests
             long[] itemsToEquip = new long[] { recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", invalidMembershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
-            Assert.AreEqual(1, actual.EquipResults.Length);
+            Assert.AreEqual(1, actual.EquipResults.Count);
             Assert.AreEqual(BungiePlatformErrorCodes.DestinyAccountNotFound, actual.EquipResults[0].EquipStatus);
         }
 
