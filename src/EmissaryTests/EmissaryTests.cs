@@ -17,6 +17,19 @@ namespace EmissaryTests
     public class EmissaryTests
     {
 
+        [TestMethod]
+        public void CurrentlyEquipped_x_x()
+        {
+            IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
+            IManifestDao manifestDao = Mock.Of<IManifestDao>();
+            IUserDao userDao = Mock.Of<IUserDao>();
+            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
+            EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissary emissary = new Emissary(bungieApiService, manifestDao, userDao, loadoutDao, dbContext);
+            Assert.Fail();
+        }
+
+
 
 
 

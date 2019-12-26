@@ -23,7 +23,7 @@ namespace Emissary
             throw new NotImplementedException();
         }
 
-        public Loadout GetLoadout(ulong discordId, string loadoutName)
+        public Loadout GetLoadout(ulong discordId, long destinyCharacterId, string loadoutName)
         {
             // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
             // Loadout foundLoadout;
@@ -49,7 +49,7 @@ namespace Emissary
             throw new NotImplementedException();
         }
 
-        public void RemoveLoadout(ulong discordId, string loadoutName)
+        public void RemoveLoadout(ulong discordId, long destinyCharacterId, string loadoutName)
         {
             // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
             // if (loadoutEntity != null) {

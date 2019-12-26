@@ -9,13 +9,19 @@ namespace Emissary
     // note: discord IDs are UInt64 (ulong). bungie IDs are Int64 (long).
     public class Emissary : IEmissary
     {
-        private IBungieApiService bungieApiService;
-        private IManifestDao manifestAccessor;
+        private readonly IBungieApiService bungieApiService;
+        private readonly IManifestDao manifestAccessor;
+        private readonly IUserDao userDao;
+        private readonly ILoadoutDao loadoutDao;
+        private readonly EmissaryDbContext dbContext;
 
-        public Emissary(IBungieApiService bungieApiService, IManifestDao manifestAccessor)
+        public Emissary(IBungieApiService bungieApiService, IManifestDao manifestAccessor, IUserDao userDao, ILoadoutDao loadoutDao, EmissaryDbContext dbContext)
         {
             this.bungieApiService = bungieApiService;
             this.manifestAccessor = manifestAccessor;
+            this.userDao = userDao;
+            this.loadoutDao = loadoutDao;
+            this.dbContext = dbContext;
         }
 
         public Loadout CurrentlyEquipped(ulong discordId)
@@ -43,7 +49,7 @@ namespace Emissary
             throw new NotImplementedException();
         }
 
-        public string Authorize(string discordIdAuthState, string authCode)
+        public string Authorize(string discordId, string authCode)
         {
             throw new NotImplementedException();
         }
