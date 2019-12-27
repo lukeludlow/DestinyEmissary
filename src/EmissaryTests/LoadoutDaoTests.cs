@@ -14,182 +14,137 @@ namespace EmissaryTests
     public class LoadoutDaoTests
     {
 
-        // [TestMethod]
-        // public void AddOrUpdateLoadout_ExampleLoadout_ShouldWriteToDatabase()
-        // {
-        //     // string testDbPath = "/Users/luke/code/DestinyEmissary/src/data/emissary-test.db";
-        //     using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
-        //         connection.Open();
-        //         DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
-        //             .UseSqlite(connection)
-        //             .Options;
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             dbContext.Database.EnsureCreated();
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Loadout loadout = new Loadout("name", 69, 420,
-        //                 new WeaponLoadout(
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class")),
-        //                 new ArmorLoadout(
-        //                     new Armor("name", "helmet", "classtype"),
-        //                     new Armor("name", "gauntlets", "classtype"),
-        //                     new Armor("name", "chest", "classtype"),
-        //                     new Armor("name", "legs", "classtype"),
-        //                     new Armor("name", "classitem", "classtype")),
-        //                 new ClassLoadout("race", "gender", "subclass", "subclasstree"));
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             loadoutDao.AddOrUpdateLoadout(loadout);
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Assert.AreEqual(1, dbContext.Loadouts.Count());
-        //             LoadoutDbEntity foundLoadout = dbContext.Loadouts.Where(l => l.Name == "name" && l.DiscordID == 69).AsQueryable().FirstOrDefault();
-        //             Assert.AreEqual("name", foundLoadout.Name);
-        //         }
-        //     }
-        // }
+        [TestMethod]
+        public void AddOrUpdateLoadout_ExampleLoadout_ShouldWriteToDatabase()
+        {
 
-        // [TestMethod]
-        // public void AddOrUpdateLoadout_LoadoutAlreadyExistsUpdateItWithNewValue_ShouldWriteToDatabase()
-        // {
-        //     using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
-        //         connection.Open();
-        //         DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
-        //             .UseSqlite(connection)
-        //             .Options;
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             dbContext.Database.EnsureCreated();
-        //         }
+            ulong discordId = 221313820847636491;
+            long destinyCharacterId = 2305843009504575107;
+            uint izanagiHash = 3211806999;
+            long izanagiInstanceId = 6917529135183883487;
+            string loadoutName = "crucible";
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
 
-        //         Loadout loadout = new Loadout("name", 69, 420,
-        //                              new WeaponLoadout(
-        //                                  new Weapon("name", "type", "class"),
-        //                                  new Weapon("name", "type", "class"),
-        //                                  new Weapon("name", "type", "class")),
-        //                              new ArmorLoadout(
-        //                                  new Armor("name", "helmet", "classtype"),
-        //                                  new Armor("name", "gauntlets", "classtype"),
-        //                                  new Armor("name", "chest", "classtype"),
-        //                                  new Armor("name", "legs", "classtype"),
-        //                                  new Armor("name", "classitem", "classtype")),
-        //                              new ClassLoadout("race", "gender", "subclass", "subclasstree"));
+            // string testDbPath = "/Users/luke/code/DestinyEmissary/src/data/emissary-test.db";
+            using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
+                connection.Open();
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    dbContext.Database.EnsureCreated();
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    loadoutDao.AddOrUpdateLoadout(loadout);
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    Assert.AreEqual(1, dbContext.Loadouts.Count());
+                    Loadout foundLoadout = dbContext.Loadouts.Where(l => l.LoadoutName == loadoutName && l.DiscordId == discordId).AsQueryable().FirstOrDefault();
+                    Assert.IsNotNull(foundLoadout);
+                }
+            }
+        }
 
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             loadoutDao.AddOrUpdateLoadout(loadout);
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Assert.AreEqual(1, dbContext.Loadouts.Count());
-        //             LoadoutDbEntity foundLoadout = dbContext.Loadouts.Where(l => l.Name == "name" && l.DiscordID == 69).AsQueryable().FirstOrDefault();
-        //             Assert.AreEqual("name", foundLoadout.Name);
-        //             Assert.AreEqual(JsonConvert.SerializeObject(loadout), foundLoadout.Json);
-        //         }
-        //         // now let's update the loadout contents and assert again
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             loadout.Weapons.KineticWeapon.Name = "newName";
-        //             loadout.Armor.Helmet.Type = "helmet2";
-        //             loadout.CharacterClass.Race = "human";
-        //             loadoutDao.AddOrUpdateLoadout(loadout);
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Assert.AreEqual(1, dbContext.Loadouts.Count());
-        //             LoadoutDbEntity foundLoadout = dbContext.Loadouts.Where(l => l.Name == "name" && l.DiscordID == 69).AsQueryable().FirstOrDefault();
-        //             Assert.AreEqual("name", foundLoadout.Name);
-        //             Assert.AreEqual(JsonConvert.SerializeObject(loadout), foundLoadout.Json);
-        //         }
-        //     }
-        // }
+        [TestMethod]
+        public void AddOrUpdateLoadout_LoadoutAlreadyExistsUpdateItWithNewValue_ShouldWriteToDatabase()
+        {
 
-        // [TestMethod]
-        // public void AddOrUpdateLoadout_SameDiscordIDButDifferentName_ShouldWriteBothToDatabase()
-        // {
-        //     using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
-        //         connection.Open();
-        //         DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
-        //             .UseSqlite(connection)
-        //             .Options;
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             dbContext.Database.EnsureCreated();
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Loadout loadout = new Loadout("name", 69, 420,
-        //                 new WeaponLoadout(
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class")),
-        //                 new ArmorLoadout(
-        //                     new Armor("name", "helmet", "classtype"),
-        //                     new Armor("name", "gauntlets", "classtype"),
-        //                     new Armor("name", "chest", "classtype"),
-        //                     new Armor("name", "legs", "classtype"),
-        //                     new Armor("name", "classitem", "classtype")),
-        //                 new ClassLoadout("race", "gender", "subclass", "subclasstree"));
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             loadoutDao.AddOrUpdateLoadout(loadout);
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Assert.AreEqual(1, dbContext.Loadouts.Count());
-        //             LoadoutDbEntity foundLoadout = dbContext.Loadouts.Where(l => l.Name == "name" && l.DiscordID == 69).AsQueryable().FirstOrDefault();
-        //             Assert.AreEqual("name", foundLoadout.Name);
-        //         }
-        //         // now we'll just change the name of the loadout and re-add it. the discord id and json values will be
-        //         // the exact same. the same user should be able to have multiple loadouts with the same equipment. 
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Loadout loadout2 = new Loadout("loadout2", 69, 420,
-        //                 new WeaponLoadout(
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class"),
-        //                     new Weapon("name", "type", "class")),
-        //                 new ArmorLoadout(
-        //                     new Armor("name", "helmet", "classtype"),
-        //                     new Armor("name", "gauntlets", "classtype"),
-        //                     new Armor("name", "chest", "classtype"),
-        //                     new Armor("name", "legs", "classtype"),
-        //                     new Armor("name", "classitem", "classtype")),
-        //                 new ClassLoadout("race", "gender", "subclass", "subclasstree"));
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             loadoutDao.AddOrUpdateLoadout(loadout2);
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             Assert.AreEqual(2, dbContext.Loadouts.Count());
-        //             LoadoutDbEntity foundLoadout = dbContext.Loadouts.Where(l => l.Name == "loadout2" && l.DiscordID == 69).AsQueryable().FirstOrDefault();
-        //             Assert.AreEqual("loadout2", foundLoadout.Name);
-        //         }
-        //     }
-        // }
+            ulong discordId = 221313820847636491;
+            long destinyCharacterId = 2305843009504575107;
+            uint izanagiHash = 3211806999;
+            long izanagiInstanceId = 6917529135183883487;
+            string loadoutName = "crucible";
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
 
-        // [TestMethod]
-        // public void GetLoadout_UserHasNoLoadouts_ShouldReturnNull()
-        // {
-        //     using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
-        //         connection.Open();
-        //         DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
-        //             .UseSqlite(connection)
-        //             .Options;
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             dbContext.Database.EnsureCreated();
-        //         }
-        //         using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
-        //             // Loadout loadout = new Loadout("name", 69, 420,
-        //             //     new WeaponLoadout(
-        //             //         new Weapon("name", "type", "class"),
-        //             //         new Weapon("name", "type", "class"),
-        //             //         new Weapon("name", "type", "class")),
-        //             //     new ArmorLoadout(
-        //             //         new Armor("name", "helmet", "classtype"),
-        //             //         new Armor("name", "gauntlets", "classtype"),
-        //             //         new Armor("name", "chest", "classtype"),
-        //             //         new Armor("name", "legs", "classtype"),
-        //             //         new Armor("name", "classitem", "classtype")),
-        //             //     new ClassLoadout("race", "gender", "subclass", "subclasstree"));
-        //             LoadoutDao loadoutDao = new LoadoutDao(dbContext);
-        //             Loadout foundLoadout = loadoutDao.GetLoadout(69, "crucible");
-        //             Assert.IsNull(foundLoadout);
-        //         }
-        //     }
-        // }
+            using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
+                connection.Open();
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    dbContext.Database.EnsureCreated();
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    loadoutDao.AddOrUpdateLoadout(loadout);
+                    Assert.AreEqual(1, dbContext.Loadouts.Count());
+                }
+                // now let's update the loadout contents and assert again
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    loadout.Items.Remove(loadout.Items.Single(item => item.Name == "Izanagi's Burden"));
+                    loadoutDao.AddOrUpdateLoadout(loadout);
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    Assert.AreEqual(1, dbContext.Loadouts.Count());
+                    Loadout foundLoadout = dbContext.Loadouts.Where(l => l.LoadoutName == loadoutName && l.DiscordId == discordId).AsQueryable().FirstOrDefault();
+                    Assert.AreEqual(0, foundLoadout.Items.Count);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void AddOrUpdateLoadout_SameDiscordIdAndSameNameButDifferentDestinyCharacter_ShouldWriteBothToDatabase()
+        {
+            ulong discordId = 221313820847636491;
+            long destinyCharacterId = 2305843009504575107;
+            uint izanagiHash = 3211806999;
+            long izanagiInstanceId = 6917529135183883487;
+            string loadoutName = "crucible";
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
+            Loadout loadout2 = new Loadout(discordId, 69, loadoutName, new List<DestinyItem>() { });
+
+            using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
+                connection.Open();
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    dbContext.Database.EnsureCreated();
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    loadoutDao.AddOrUpdateLoadout(loadout);
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    Assert.AreEqual(1, dbContext.Loadouts.Count());
+                    Loadout foundLoadout = dbContext.Loadouts.Where(l => l.LoadoutName == loadoutName && l.DiscordId == discordId && l.DestinyCharacterId == destinyCharacterId).AsQueryable().FirstOrDefault();
+                    Assert.AreEqual(loadout.DestinyCharacterId, foundLoadout.DestinyCharacterId);
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    loadoutDao.AddOrUpdateLoadout(loadout2);
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    Assert.AreEqual(2, dbContext.Loadouts.Count());
+                    Loadout foundLoadout = dbContext.Loadouts.Where(l => l.LoadoutName == loadoutName && l.DiscordId == discordId && l.DestinyCharacterId == 69).AsQueryable().FirstOrDefault();
+                    Assert.AreEqual(69, foundLoadout.DestinyCharacterId);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GetLoadout_UserHasNoLoadouts_ShouldReturnNull()
+        {
+            using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
+                connection.Open();
+                DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
+                    .UseSqlite(connection)
+                    .Options;
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    dbContext.Database.EnsureCreated();
+                }
+                using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
+                    LoadoutDao loadoutDao = new LoadoutDao(dbContext);
+                    Loadout foundLoadout = loadoutDao.GetLoadout(69, 420, "crucible");
+                    Assert.IsNull(foundLoadout);
+                }
+            }
+        }
 
         // [TestMethod]
         // public void GetLoadout_UserHasLoadoutsButNameDoesntMatch_ShouldReturnNull()

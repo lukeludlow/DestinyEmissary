@@ -20,6 +20,7 @@ namespace EmissaryCore
             throw new NotImplementedException();
         }
 
+        // TODO return null, don't throw any exceptions
         public EmissaryUser GetUserByDiscordId(ulong discordId)
         {
             // return dbContext.Users.Find(discordId);

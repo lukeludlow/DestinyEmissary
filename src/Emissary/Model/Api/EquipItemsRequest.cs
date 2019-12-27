@@ -16,7 +16,7 @@ namespace EmissaryCore
         [JsonProperty("itemIds")]
         public IList<long> ItemInstanceIds { get; set; }
 
-        public EquipItemsRequest(string accessToken, int membershipType, long destinyCharacterId, long[] itemInstanceIds)
+        public EquipItemsRequest(string accessToken, int membershipType, long destinyCharacterId, IList<long> itemInstanceIds)
         {
             this.AccessToken = accessToken;
             this.MembershipType = membershipType;

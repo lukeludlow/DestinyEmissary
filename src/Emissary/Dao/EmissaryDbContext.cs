@@ -1,4 +1,7 @@
+using System;
+using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace EmissaryCore
 {
@@ -28,7 +31,14 @@ namespace EmissaryCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Loadout>().HasKey(l => new { l.DiscordId, l.DestinyCharacterId, l.LoadoutName });
+            modelBuilder.Entity<Loadout>()
+                        .HasKey(l => new { l.DiscordId, l.DestinyCharacterId, l.LoadoutName });
+            modelBuilder.Entity<Loadout>()
+                        .Property(l => l.Items)
+                        .HasConversion(
+                            v => JsonConvert.SerializeObject(v),
+                            v => JsonConvert.DeserializeObject<List<DestinyItem>>(v)
+                        );
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

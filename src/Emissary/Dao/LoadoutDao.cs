@@ -25,28 +25,19 @@ namespace EmissaryCore
 
         public Loadout GetLoadout(ulong discordId, long destinyCharacterId, string loadoutName)
         {
-            // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
-            // Loadout foundLoadout;
-            // if (loadoutEntity != null) {
-            //     foundLoadout = loadoutEntity.ToLoadout();
-            // } else {
-            //     foundLoadout = null;
-            // }
-            // return foundLoadout;
-            throw new NotImplementedException();
+            Loadout foundLoadout = dbContext.Loadouts.Find(discordId, destinyCharacterId, loadoutName);
+            return foundLoadout;
         }
 
         public void AddOrUpdateLoadout(Loadout loadout)
         {
-            // LoadoutDbEntity loadoutEntity = new LoadoutDbEntity(loadout);
-            // LoadoutDbEntity existingLoadout = dbContext.Loadouts.Where(l => l.Name == loadoutEntity.Name && l.DiscordID == loadoutEntity.DiscordID).AsQueryable().FirstOrDefault();
-            // if (existingLoadout == null) {
-            //     dbContext.Loadouts.Add(loadoutEntity);
-            // } else {
-            //     dbContext.Entry(existingLoadout).CurrentValues.SetValues(loadoutEntity);
-            // }
-            // dbContext.SaveChanges();
-            throw new NotImplementedException();
+            Loadout existingLoadout = dbContext.Loadouts.Where(l => l.LoadoutName == loadout.LoadoutName && l.DiscordId == loadout.DiscordId && l.DestinyCharacterId == loadout.DestinyCharacterId).AsQueryable().FirstOrDefault();
+            if (existingLoadout == null) {
+                dbContext.Loadouts.Add(loadout);
+            } else {
+                dbContext.Entry(existingLoadout).CurrentValues.SetValues(loadout);
+            }
+            dbContext.SaveChanges();
         }
 
         public void RemoveLoadout(ulong discordId, long destinyCharacterId, string loadoutName)

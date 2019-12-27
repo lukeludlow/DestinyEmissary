@@ -10,10 +10,10 @@ namespace EmissaryCore.Common
     public interface IEmissary
     {
         Loadout CurrentlyEquipped(ulong discordId);
-        IList<Loadout> ListLoadouts(ulong discordId);
-        string EquipLoadout(ulong discordId, string loadoutName);
-        string SaveLoadout(ulong discordId, string loadoutName);
+        EmissaryResult ListLoadouts(ulong discordId);
+        EmissaryResult EquipLoadout(ulong discordId, string loadoutName);
+        EmissaryResult SaveLoadout(ulong discordId, Loadout loadout, string loadoutName);
         string DeleteLoadout(ulong discordId, string loadoutName);
-        string Authorize(string discordId, string authCode);
+        EmissaryResult RegisterOrReauthorize(ulong discordId, string authCode);
     }
 }

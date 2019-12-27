@@ -129,11 +129,11 @@ namespace EmissaryTests
             // assert
             Assert.AreEqual(2, actual.DestinyMemberships.Count);
             Assert.AreEqual("anime8094", actual.DestinyMemberships[0].DisplayName);
-            Assert.AreEqual(4611686018497175745, actual.DestinyMemberships[0].DestinyMembershipId);
+            Assert.AreEqual(4611686018497175745, actual.DestinyMemberships[0].DestinyProfileId);
             Assert.AreEqual(1, actual.DestinyMemberships[0].MembershipType);
             Assert.AreEqual(3, actual.DestinyMemberships[0].CrossSaveOverride);
             Assert.AreEqual("pimpdaddy", actual.DestinyMemberships[1].DisplayName);
-            Assert.AreEqual(4611686018467260757, actual.DestinyMemberships[1].DestinyMembershipId);
+            Assert.AreEqual(4611686018467260757, actual.DestinyMemberships[1].DestinyProfileId);
             Assert.AreEqual(3, actual.DestinyMemberships[1].MembershipType);
             Assert.AreEqual(3, actual.DestinyMemberships[1].CrossSaveOverride);
         }
@@ -404,7 +404,7 @@ namespace EmissaryTests
             // uint recluseItemHash = 3354242550;
             long recluseItemInstanceId = 6917529123204409619;
             // uint suddenDeathItemHash = 1879212552;
-            long suddenDeathItemInstanceId = 6917529043814140192;
+            // long suddenDeathItemInstanceId = 6917529043814140192;
 
             int membershipType = 3;
             long characterId = 2305843009504575107;

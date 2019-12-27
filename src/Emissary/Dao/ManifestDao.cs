@@ -20,14 +20,27 @@ namespace EmissaryCore
             this.manifestPath = GetManifestPath();
         }
 
-        public DestinyItem LookupItem(uint itemHash)
+
+        public ManifestItemDefinition GetItemDefinition(uint itemHash)
         {
-            int itemId = ConvertHashToTableId(itemHash);
-            string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
-            string json = TryExecuteCommand(commandText, manifestPath);
-            DestinyItem item = JsonConvert.DeserializeObject<DestinyItem>(json);
-            return item;
+            throw new NotImplementedException();
         }
+
+        public ManifestItemCategoryDefinition GetItemCategoryDefinition(uint categoryHash)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        // public DestinyItem LookupItem(uint itemHash)
+        // {
+        //     int itemId = ConvertHashToTableId(itemHash);
+        //     string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
+        //     string json = TryExecuteCommand(commandText, manifestPath);
+        //     DestinyItem item = JsonConvert.DeserializeObject<DestinyItem>(json);
+        //     return item;
+        // }
 
         // public DestinyItemCategory LookupItemCategory(uint itemCategoryHash)
         // {
