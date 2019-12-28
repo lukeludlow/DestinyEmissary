@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace EmissaryTests
 {
@@ -18,12 +19,14 @@ namespace EmissaryTests
         [TestMethod]
         public void GetOAuthAccessToken_ValidCode_ShouldReturnAccessTokenAndNullErrorMessage()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => 
+                    m["Bungie:ApiKey"] == "dummy-api-key" &&
+                    m["Bungie:ClientId"] == "dummy-client-id" &&
+                    m["Bungie:ClientSecret"] == "dummy-client-secret");
             // arrange
             Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
             string authCode = "15bf7985a28208b83997b090302b36a7";  // just an old example auth code
-            string clientId = "69420";
-            string clientSecret = "X.69-x";
-            string content = $"grant_type=authorization_code&code={authCode}&client_id={clientId}&client_secret={clientSecret}";
+            string content = $"grant_type=authorization_code&code={authCode}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
             string responseString = TestUtils.ReadFile("OAuth-valid.json");
             string expectedAccessCode = "CLDjARKGAgAgVJDu+K+f85W6S6eJJi+s7U9tXkxDzInlc8I78HfgcabgAAAATOBrgq37w0FGjQ6XoVCLI4Mntf9IjfT91ByO4T59755lmaJvWMdnNpm4YcKglZiJN9IT0lLuZNifSUZRtWl1Xi+m83Eoh6VBMxRaec9Feeu4Coa53XzEAVr/BadPeaugfqB8A5jgEcRdQrnSH092D1h1ntzLpm0cOUttRGqMFpw/nR9Sm0vF1i4kdrq8F9gx+PQ6fJvbBxOKYZRSnQUgr3WjSSgWGmOvAu778Ikf/0tN7dmgpX6JFHcb2U1fcvSprnbb0qcqsGB71KsSvRqgJ5T9/LswkBT9TIHbrtS/cPg=";
             Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
@@ -46,8 +49,8 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
-            OAuthRequest request = new OAuthRequest(authCode, clientId, clientSecret);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
+            OAuthRequest request = new OAuthRequest(authCode);
             // act
             OAuthResponse actual = bungieApiService.GetOAuthAccessToken(request);
             // assert
@@ -58,13 +61,17 @@ namespace EmissaryTests
         [TestMethod]
         public void GetOAuthAccessToken_InvalidCode_ShouldReturnNullAccessTokenAndErrorMessage()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => 
+                    m["Bungie:ApiKey"] == "dummy-api-key" &&
+                    m["Bungie:ClientId"] == "dummy-client-id" &&
+                    m["Bungie:ClientSecret"] == "dummy-client-secret");
             // arrange
             Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
             // just an old example auth code. let's pretend this code expired or was already used
             string authCode = "15bf7985a28208b83997b090302b36a7";
             string clientId = "69420";
             string clientSecret = "X.69-x";
-            string content = $"grant_type=authorization_code&code={authCode}&client_id={clientId}&client_secret={clientSecret}";
+            string content = $"grant_type=authorization_code&code={authCode}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
             string responseString = TestUtils.ReadFile("OAuth-invalid-auth-code.json");
             Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mock
@@ -86,8 +93,8 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
-            OAuthRequest request = new OAuthRequest(authCode, clientId, clientSecret);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
+            OAuthRequest request = new OAuthRequest(authCode);
             // act
             OAuthResponse actual = bungieApiService.GetOAuthAccessToken(request);
             // assert
@@ -98,6 +105,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetMembershipsForUser_PersonalAccount_ShouldReturnAllDestinyMemberships()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // arrange
             Uri uri = new Uri("https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/");
             // just an old example access token
@@ -122,7 +130,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             UserMembershipsRequest request = new UserMembershipsRequest(accessToken);
             // act
             UserMembershipsResponse actual = bungieApiService.GetMembershipsForUser(request);
@@ -141,6 +149,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetMembershipsForUser_InvalidAccessToken_ShouldThrowApiExceptionUnauthorized()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // arrange
             Uri uri = new Uri("https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/");
             // just an old example access token
@@ -165,7 +174,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             UserMembershipsRequest request = new UserMembershipsRequest(accessToken);
             // act (and assert)
             var exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.GetMembershipsForUser(request));
@@ -175,6 +184,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetProfileCharacters_PersonalAccount_ShouldReturnAllCharacters()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             int membershipType = 3;
             long destinyMembershipId = 4611686018467260757;
             Uri uri = new Uri($"https://www.bungie.net/Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=200");
@@ -197,7 +207,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
 
             DestinyCharacter expectedCharacter = new DestinyCharacter();
             expectedCharacter.CharacterId = 2305843009504575107;
@@ -226,6 +236,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetProfileCharacters_CrossSaveOverrideSearchForXboxAccount_ShouldThrowApiExceptionDestinyAccountNotFound()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             int membershipType = 1;
             long destinyMembershipId = 4611686018497175745;
             Uri uri = new Uri($"https://www.bungie.net/Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=200");
@@ -248,7 +259,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             ProfileCharactersRequest request = new ProfileCharactersRequest(membershipType, destinyMembershipId);
             // act (and assert)
             var exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.GetProfileCharacters(request));
@@ -258,6 +269,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetCharacterEquipment_Personal_ShouldReturnEquippedGear()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // assemble
             int membershipType = 3;
             long membershipId = 4611686018467260757;
@@ -282,7 +294,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             CharacterEquipmentRequest request = new CharacterEquipmentRequest(membershipType, membershipId, characterId);
             // act
             CharacterEquipmentResponse actual = bungieApiService.GetCharacterEquipment(request);
@@ -294,6 +306,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetCharacterEquipment_InvalidMembershipType_ShouldThrowApiExceptionInvalidParameters()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // assemble
             int membershipType = 1;
             long membershipId = 4611686018467260757;
@@ -318,7 +331,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             CharacterEquipmentRequest request = new CharacterEquipmentRequest(membershipType, membershipId, characterId);
             // act (and assert)
             var exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.GetCharacterEquipment(request));
@@ -328,6 +341,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetCharacterEquipment_InvalidCharacterId_ShouldThrowApiExceptionBecauseResponseDataIsEmpty()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // assemble
             int membershipType = 3;
             long membershipId = 4611686018467260757;
@@ -352,7 +366,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             CharacterEquipmentRequest request = new CharacterEquipmentRequest(membershipType, membershipId, characterId);
             // act (and assert)
             var exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.GetCharacterEquipment(request));
@@ -362,6 +376,7 @@ namespace EmissaryTests
         [TestMethod]
         public void GetCharacterEquipment_InvalidMembershipId_ShouldThrowApiExceptionAccountNotFound()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // assemble
             int membershipType = 3;
             long membershipId = 69;
@@ -386,7 +401,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             CharacterEquipmentRequest request = new CharacterEquipmentRequest(membershipType, membershipId, characterId);
             // act (and assert)
             var exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.GetCharacterEquipment(request));
@@ -397,6 +412,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_JustOneItem_ShouldChangeCorrespondingItem()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // for example, if i tell it to equip the recluse, it should change whatever was 
             // in my energy weapon slot before this. since this is all just item hashes and ids, 
             // this is just something that i figured out manually for the test.
@@ -430,7 +446,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, new long[] { recluseItemInstanceId });
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
             Assert.AreEqual(1, actual.EquipResults.Count);
@@ -440,6 +456,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_EquipEveryInventoryItem_AllShouldSucceed()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             // item instance IDs
             long perfectParadox = 6917529138356180356;
             long suddenDeath = 6917529043814140192;
@@ -483,7 +500,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             long[] itemsToEquip = new long[] {
                 perfectParadox,
                 suddenDeath,
@@ -512,6 +529,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_EquipZeroItems_ShouldSucceedButdoNothing()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             int membershipType = 3;
             long characterId = 2305843009504575107;
             Uri uri = new Uri($"https://www.bungie.net/Platform/Destiny2/Actions/Items/EquipItems/");
@@ -536,7 +554,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, new long[] { });
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
             Assert.AreEqual(0, actual.EquipResults.Count);
@@ -545,6 +563,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_EquipTheSameItemMultipleTimesInSameRequest_ShouldSucceed()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             long recluseItemInstanceId = 6917529123204409619;
 
             int membershipType = 3;
@@ -571,7 +590,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             long[] itemsToEquip = new long[] { recluseItemInstanceId, recluseItemInstanceId, recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
@@ -581,6 +600,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_SomeInvalidItemInstanceIDs_ShouldSuccessfullyEquipItemsAndReturnErrorStatusForInvalidItem()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             long invalidItemInstanceId = 69;
             long recluseItemInstanceId = 6917529123204409619;
 
@@ -608,7 +628,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             long[] itemsToEquip = new long[] { invalidItemInstanceId, recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
@@ -623,6 +643,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_InvalidPlatform_ShouldReturnErrorCodeDestinyAccountNotFound()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             long recluseItemInstanceId = 6917529123204409619;
 
             int invalidMembershipType = 1;
@@ -649,7 +670,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             long[] itemsToEquip = new long[] { recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", invalidMembershipType, characterId, itemsToEquip);
             EquipItemsResponse actual = bungieApiService.EquipItems(request);
@@ -660,6 +681,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipItems_AccessTokenInvalidExpired_ShouldThrowApiExceptionUnauthorized()
         {
+            IConfiguration config = Mock.Of<IConfiguration>(m => m["Bungie:ApiKey"] == "dummy-api-key");
             long recluseItemInstanceId = 6917529123204409619;
             int membershipType = 3;
             long characterId = 2305843009504575107;
@@ -685,7 +707,7 @@ namespace EmissaryTests
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
-            BungieApiService bungieApiService = new BungieApiService(httpClient);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
             long[] itemsToEquip = new long[] { recluseItemInstanceId };
             EquipItemsRequest request = new EquipItemsRequest("access.token", membershipType, characterId, itemsToEquip);
             BungieApiException exception = Assert.ThrowsException<BungieApiException>(() => bungieApiService.EquipItems(request));

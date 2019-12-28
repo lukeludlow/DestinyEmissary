@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Emissary\Emissary.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

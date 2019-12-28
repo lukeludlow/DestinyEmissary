@@ -8,12 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Discord.Commands;
 using System.Net.Http;
 using System.Net;
+using EmissaryCore;
 
 namespace EmissaryBot
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; private set; }
+        public IConfiguration Configuration { get; private set; }
 
         public Startup()
         {
@@ -52,10 +53,11 @@ namespace EmissaryBot
                     .AddSingleton<CommandHandler>()
                     .AddSingleton<AuthorizationRedirectService>()
                     .AddSingleton<StartupService>()
+                    .AddSingleton<EmissaryService>()
                     .AddSingleton(Configuration);
         }
 
-        private IConfigurationRoot BuildConfiguration()
+        private IConfiguration BuildConfiguration()
         {
             // TODO detect where the config.json file is
             // we are in "production" (running from the console)

@@ -14,15 +14,15 @@ namespace EmissaryBot
         private readonly DiscordSocketClient discordClient;
         private readonly CommandService commandService;
         private readonly AuthorizationRedirectService authorizationRedirectService;
-        private readonly IConfigurationRoot config;
+        private readonly IConfiguration config;
 
-        public StartupService(IServiceProvider services, DiscordSocketClient client, CommandService commands, AuthorizationRedirectService authorizationRedirectService, IConfigurationRoot configuration)
+        public StartupService(IServiceProvider services, DiscordSocketClient client, CommandService commands, AuthorizationRedirectService authorizationRedirectService, IConfiguration config)
         {
             serviceProvider = services;
             discordClient = client;
             commandService = commands;
             this.authorizationRedirectService = authorizationRedirectService;
-            config = configuration;
+            this.config = config;
         }
 
         public async Task StartAsync()

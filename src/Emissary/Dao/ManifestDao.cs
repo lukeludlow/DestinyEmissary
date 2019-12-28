@@ -4,27 +4,28 @@ using System.IO.Compression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 
 namespace EmissaryCore
 {
     public class ManifestDao : IManifestDao
     {
+        private readonly IConfiguration config;
         private IDatabaseAccessor databaseAccessor;
-        private string manifestPath;
         // private IBungieApiService bungieApiService;
         // public string CurrentVersion { get; set; }
 
-        public ManifestDao(IDatabaseAccessor databaseAccessor)
+        public ManifestDao(IConfiguration config, IDatabaseAccessor databaseAccessor)
         {
+            this.config = config;
             this.databaseAccessor = databaseAccessor;
-            this.manifestPath = GetManifestPath();
         }
 
         public ManifestItemDefinition GetItemDefinition(uint itemHash)
         {
             int itemId = ConvertHashToTableId(itemHash);
             string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
-            string json = databaseAccessor.ExecuteCommand(commandText, manifestPath);
+            string json = databaseAccessor.ExecuteCommand(commandText, config["Emissary:ManifestPath"]);
             ManifestItemDefinition itemDefinition = JsonConvert.DeserializeObject<ManifestItemDefinition>(json);
             return itemDefinition;
         }
@@ -33,7 +34,7 @@ namespace EmissaryCore
         {
             int itemCategoryId = ConvertHashToTableId(categoryHash);
             string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
-            string json = databaseAccessor.ExecuteCommand(commandText, manifestPath);
+            string json = databaseAccessor.ExecuteCommand(commandText, config["Emissary:ManifestPath"]);
             ManifestItemCategoryDefinition categoryDefinition = JsonConvert.DeserializeObject<ManifestItemCategoryDefinition>(json);
             return categoryDefinition;
         }
@@ -47,16 +48,18 @@ namespace EmissaryCore
             return id;
         }
 
+
         // TODO refactor this is very bad
-        private string GetManifestPath()
-        {
-            string workingDirectory = Environment.CurrentDirectory;
-            string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(solutionDirectory, "data");
-            string localManifestFileName = "79433.19.11.13.1925-2.manifest";
-            string localManifestFile = Path.Combine(dataDirectory, localManifestFileName);
-            return localManifestFile;
-        }
+
+        // private string GetManifestPath()
+        // {
+        //     string workingDirectory = Environment.CurrentDirectory;
+        //     string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+        //     string dataDirectory = Path.Combine(solutionDirectory, "data");
+        //     string localManifestFileName = "79433.19.11.13.1925-2.manifest";
+        //     string localManifestFile = Path.Combine(dataDirectory, localManifestFileName);
+        //     return localManifestFile;
+        // }
 
 
         // TODO make it so that this checks for the latest version and downloads the new manifest only if needed

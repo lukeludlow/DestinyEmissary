@@ -1,7 +1,6 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EmissaryCore;
-using EmissaryCore.Common;
 using System.Collections.Generic;
 using System.IO;
 using Moq;
@@ -9,6 +8,9 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Newtonsoft.Json;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace EmissaryTests
 {
@@ -24,6 +26,10 @@ namespace EmissaryTests
         [TestMethod]
         public void CurrentlyEquipped_MultipleCharacters_ShouldReturnEquippedItemsForMostRecentlyPlayedCharacter()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
+            // TODO do i need this?
+            // Mock.Get(config).Setup(m => m["Bungie:ApiToken"]).Returns("");
+
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -55,6 +61,12 @@ namespace EmissaryTests
             CharacterEquipmentResponse equipmentResponse = new CharacterEquipmentResponse(equippedItems);
             Mock.Get(bungieApiService).Setup(m => m.GetCharacterEquipment(It.Is<CharacterEquipmentRequest>(r => r.DestinyCharacterId == titan.CharacterId && r.DestinyProfileId == destinyProfileId && r.DestinyMembershipType == destinyMembershipType))).Returns(equipmentResponse);
 
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
+                    new List<string>() { "Kinetic Weapon", "Weapon", "Sniper Rifle" }, izanagiHash,
+                    new List<uint>() { 2, 1, 10 });
+            IList<DestinyItem> expectedLoadoutItems = new List<DestinyItem>() { izanagiItem };
+            Loadout expectedLoadout = new Loadout(discordId, titan.CharacterId, "currently equipped", expectedLoadoutItems);
+
             // IBungieApiService bungieApiService = Mock.Of<IBungieApiService>(x =>
             // x.GetProfileCharacters(charactersRequest) == charactersResponse &&
             // x.GetCharacterEquipment(equipmentRequest) == equipmentResponse
@@ -66,30 +78,23 @@ namespace EmissaryTests
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(10)).Returns(new ManifestItemCategoryDefinition("Sniper Rifle"));
 
-            IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
 
-            Loadout actual = emissary.CurrentlyEquipped(discordId);
-
-            Assert.AreEqual(discordId, actual.DiscordId);
-            Assert.AreEqual(titan.CharacterId, actual.DestinyCharacterId);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(actual.LoadoutName));
-            Assert.AreEqual(1, actual.Items.Count);
-            Assert.AreEqual("Izanagi's Burden", actual.Items[0].Name);
-            Assert.AreEqual(3, actual.Items[0].Categories.Count);
-            Assert.IsTrue(actual.Items[0].Categories.Contains("Weapon"));
-            Assert.IsTrue(actual.Items[0].Categories.Contains("Kinetic Weapon"));
-            Assert.IsTrue(actual.Items[0].Categories.Contains("Sniper Rifle"));
+            EmissaryResult result = emissary.CurrentlyEquipped(discordId);
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedLoadout), result.Message);
         }
 
         [TestMethod]
         public void CurrentlyEquipped_UserNotRegisteredYet_ShouldThrowUserNotFoundException()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
             ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
-            IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             ulong discordId = 221313820847636491;
             Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Throws(new UserNotFoundException());
             Assert.ThrowsException<UserNotFoundException>(() => emissary.CurrentlyEquipped(discordId));
@@ -98,6 +103,7 @@ namespace EmissaryTests
         [TestMethod]
         public void CurrentlyEquipped_LotsOfItems_ShouldReturnLoadoutWithAllItems()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -106,7 +112,7 @@ namespace EmissaryTests
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
-            long destinyCharacterId = 2305843009504575107;
+            // long destinyCharacterId = 2305843009504575107;
             int destinyMembershipType = BungieMembershipType.Steam;
             EmissaryUser user = new EmissaryUser();
             user.DiscordId = discordId;
@@ -228,22 +234,24 @@ namespace EmissaryTests
             // Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
             // Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(10)).Returns(new ManifestItemCategoryDefinition("Sniper Rifle"));
 
-            IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
 
-            Loadout actual = emissary.CurrentlyEquipped(discordId);
-
-            Assert.AreEqual(discordId, actual.DiscordId);
-            Assert.AreEqual(titan.CharacterId, actual.DestinyCharacterId);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(actual.LoadoutName));
-            Assert.AreEqual(17, actual.Items.Count);
-            Assert.AreEqual("Perfect Paradox", actual.Items[0].Name);
-            Assert.AreEqual("A Sudden Death", actual.Items[1].Name);
+            EmissaryResult result = emissary.CurrentlyEquipped(discordId);
+            Assert.IsTrue(result.Success);
+            Loadout loadoutResult = JsonConvert.DeserializeObject<Loadout>(result.Message);
+            Assert.AreEqual(discordId, loadoutResult.DiscordId);
+            Assert.AreEqual(titan.CharacterId, loadoutResult.DestinyCharacterId);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(loadoutResult.LoadoutName));
+            Assert.AreEqual(17, loadoutResult.Items.Count);
+            Assert.AreEqual("Perfect Paradox", loadoutResult.Items[0].Name);
+            Assert.AreEqual("A Sudden Death", loadoutResult.Items[1].Name);
         }
 
 
         [TestMethod]
         public void SaveLoadout_NewLoadoutForRegisteredUser_ShouldSucceedAndWriteToDatabase()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -262,7 +270,7 @@ namespace EmissaryTests
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
             Loadout loadoutToSave = new Loadout(discordId, destinyCharacterId, "crucible", new List<DestinyItem>() { izanagiItem });
 
-            IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.SaveLoadout(discordId, loadoutToSave, "crucible");
             Assert.IsTrue(result.Success);
             Mock.Get(loadoutDao)
@@ -276,6 +284,7 @@ namespace EmissaryTests
         [TestMethod]
         public void SaveLoadout_OverwriteExistingLoadout_ShouldSucceedAndWriteToDatabase()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
 
@@ -303,7 +312,7 @@ namespace EmissaryTests
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     IUserDao userDao = new UserDao(dbContext);
                     ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
-                    IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+                    IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
                     emissary.SaveLoadout(discordId, loadoutToSave, "crucible");
                 }
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
@@ -314,7 +323,7 @@ namespace EmissaryTests
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     IUserDao userDao = new UserDao(dbContext);
                     ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
-                    IEmissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+                    IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
                     loadoutToSave.Items.Remove(loadoutToSave.Items.Single(item => item.Name == "Izanagi's Burden"));
                     EmissaryResult result = emissary.SaveLoadout(discordId, loadoutToSave, "crucible");
                     Assert.IsTrue(result.Success);
@@ -330,6 +339,7 @@ namespace EmissaryTests
         [TestMethod]
         public void SaveLoadout_CantAccessDatabase_ShouldReturnError()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             Loadout loadoutToSave = new Loadout(69, 420, "crucible", new List<DestinyItem>() { });
             // using Mode=ReadWrite will fail because it can't create the database.
             // the default is Mode=ReadWriteCreate which creates the database if it doesn't exist.
@@ -345,7 +355,7 @@ namespace EmissaryTests
                     // ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
                     ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
                     // EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
-                    Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+                    Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
                     // connection.Close();
                     // dbContext.Database.CloseConnection();
                     EmissaryResult result = emissary.SaveLoadout(69, loadoutToSave, "crucible");
@@ -367,6 +377,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipLoadout_UserIsRegisteredAndAuthorizedAndLoadoutExists_ShouldSendRequestToBungieApi()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -396,7 +407,7 @@ namespace EmissaryTests
             Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(It.IsAny<ulong>())).Returns(user);
             Mock.Get(loadoutDao).Setup(m => m.GetLoadout(It.IsAny<ulong>(), It.IsAny<long>(), It.IsAny<string>())).Returns(loadout);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
 
             EmissaryResult result = emissary.EquipLoadout(discordId, "raid");
             Assert.IsTrue(result.Success);
@@ -412,6 +423,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipLoadout_UserIsNotRegistered_ShouldReturnErrorResultAndNotCallBungieApi()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -421,7 +433,7 @@ namespace EmissaryTests
             ulong discordId = 221313820847636491;
             Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(It.Is<ulong>(u => u == discordId))).Returns(value: null);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.EquipLoadout(discordId, "raid");
             Assert.IsFalse(result.Success);
             Mock.Get(bungieApiService).Verify(m => m.GetOAuthAccessToken(It.IsAny<OAuthRequest>()), Times.Never());
@@ -432,6 +444,7 @@ namespace EmissaryTests
         [TestMethod]
         public void EquipLoadout_UserIsRegisteredButAccessTokenExpired_ShouldReturnErrorResult()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -461,7 +474,7 @@ namespace EmissaryTests
 
             Mock.Get(bungieApiService).Setup(m => m.EquipItems(It.IsAny<EquipItemsRequest>())).Throws(new BungieApiException("Unauthorized: Access is denied due to invalid credentials."));
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.EquipLoadout(discordId, "raid");
 
             Assert.IsFalse(result.Success);
@@ -474,6 +487,7 @@ namespace EmissaryTests
         [TestMethod]
         public void RegisterOrReauthorize_NewUser_ShouldRequestNewAccessTokenAndWriteToDatabase()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -494,9 +508,7 @@ namespace EmissaryTests
             Mock.Get(bungieApiService)
                 .Setup(m =>
                     m.GetOAuthAccessToken(It.Is<OAuthRequest>(r =>
-                        r.AuthCode == authCode &&
-                        !string.IsNullOrWhiteSpace(r.ClientId) &&
-                        !string.IsNullOrWhiteSpace(r.ClientSecret))))
+                        r.AuthCode == authCode)))
                 .Returns(authResponse);
 
             UserMembershipsResponse membershipsResponse = new UserMembershipsResponse();
@@ -509,7 +521,7 @@ namespace EmissaryTests
                         r.AccessToken == accessToken)))
                 .Returns(membershipsResponse);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
             Assert.IsTrue(result.Success);
 
@@ -528,6 +540,7 @@ namespace EmissaryTests
         [TestMethod]
         public void RegisterOrReauthorize_UserAlreadyExists_ShouldRefreshAccessTokenAndWriteToDatabase()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -551,13 +564,11 @@ namespace EmissaryTests
             Mock.Get(bungieApiService)
                 .Setup(m =>
                     m.GetOAuthAccessToken(It.Is<OAuthRequest>(r =>
-                        r.AuthCode == authCode &&
-                        !string.IsNullOrWhiteSpace(r.ClientId) &&
-                        !string.IsNullOrWhiteSpace(r.ClientSecret))))
+                        r.AuthCode == authCode)))
                 .Returns(oauthResponse);
 
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
 
             Assert.IsTrue(result.Success);
@@ -574,6 +585,7 @@ namespace EmissaryTests
         [TestMethod]
         public void RegisterOrReauthorize_ExistingUserButInvalidAuthCode_ShouldReturnErrorResultAndNotChangeDatabase()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -597,12 +609,10 @@ namespace EmissaryTests
             Mock.Get(bungieApiService)
                 .Setup(m =>
                     m.GetOAuthAccessToken(It.Is<OAuthRequest>(r =>
-                        r.AuthCode == authCode &&
-                        !string.IsNullOrWhiteSpace(r.ClientId) &&
-                        !string.IsNullOrWhiteSpace(r.ClientSecret))))
+                        r.AuthCode == authCode)))
                 .Returns(authResponse);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
             Assert.IsFalse(result.Success);
             Assert.IsTrue(result.ErrorMessage.Contains("AuthorizationCodeInvalid"));
@@ -618,6 +628,7 @@ namespace EmissaryTests
         [TestMethod]
         public void ListLoadouts_UserHasOneLoadout_ShouldReturnSuccessWithLoadoutMessageString()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -649,7 +660,7 @@ namespace EmissaryTests
             Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(allLoadoutsForUser), result.Message);
@@ -658,6 +669,7 @@ namespace EmissaryTests
         [TestMethod]
         public void ListLoadouts_UserHasLoadoutsOnDifferentCharacters_ShouldReturnLoadoutsForCurrentCharacterOnly()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -701,7 +713,7 @@ namespace EmissaryTests
             Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(titanLoadouts), result.Message);
@@ -710,6 +722,7 @@ namespace EmissaryTests
         [TestMethod]
         public void ListLoadouts_UserIsNotRegistered_ShouldReturnError()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -720,7 +733,7 @@ namespace EmissaryTests
 
             Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(value: null);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.ListLoadouts(discordId);
 
             Assert.IsFalse(result.Success);
@@ -730,6 +743,7 @@ namespace EmissaryTests
         [TestMethod]
         public void ListLoadouts_UserHasNoLoadouts_ShouldReturnSuccessButZeroLoadoutsEmptyList()
         {
+            IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
             IUserDao userDao = Mock.Of<IUserDao>();
@@ -742,7 +756,7 @@ namespace EmissaryTests
             string accessToken = "access-token";
             EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
 
-            IList<Loadout> allLoadoutsForUser = new List<Loadout>(){};
+            IList<Loadout> allLoadoutsForUser = new List<Loadout>() { };
 
             // assemble so that titan is the most recently played character
             long titanCharacterId = 2305843009504575107;
@@ -754,7 +768,7 @@ namespace EmissaryTests
             Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(allLoadoutsForUser), result.Message);

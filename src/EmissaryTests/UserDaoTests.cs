@@ -29,7 +29,9 @@ namespace EmissaryTests
                     .Options;
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     // create the schema in the database
+                    // dbContext.Database.OpenConnection();
                     dbContext.Database.EnsureCreated();
+                    // dbContext.Database.CloseConnection();
                 }
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     UserDao userDao = new UserDao(dbContext);

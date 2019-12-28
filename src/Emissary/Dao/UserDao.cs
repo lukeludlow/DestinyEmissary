@@ -21,6 +21,7 @@ namespace EmissaryCore
 
         public void AddOrUpdateUser(EmissaryUser user)
         {
+            // dbContext.Database.OpenConnection();
             EmissaryUser existingUser = dbContext.Users.Where(u => u.DiscordId == user.DiscordId).FirstOrDefault();
             if (existingUser == null) {
                 dbContext.Users.Add(user);
@@ -28,6 +29,7 @@ namespace EmissaryCore
                 dbContext.Entry(existingUser).CurrentValues.SetValues(user);
             }
             dbContext.SaveChanges();
+            // dbContext.Database.CloseConnection();
         }
 
         public void RemoveUser(ulong discordId)

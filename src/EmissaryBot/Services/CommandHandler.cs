@@ -12,15 +12,15 @@ namespace EmissaryBot
         private readonly DiscordSocketClient discordClient;
         private readonly CommandService commandService;
         private readonly LogService logService;
-        private readonly IConfigurationRoot config;
+        private readonly IConfiguration config;
         private readonly IServiceProvider serviceProvider;
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands, LogService logger, IConfigurationRoot configuration, IServiceProvider services)
+        public CommandHandler(DiscordSocketClient client, CommandService commands, LogService logger, IConfiguration config, IServiceProvider services)
         {
             discordClient = client;
             commandService = commands;
             logService = logger;
-            config = configuration;
+            this.config = config;
             serviceProvider = services;
             discordClient.MessageReceived += OnMessageReceivedAsync;
             commandService.CommandExecuted += OnCommandExecutedAsync;

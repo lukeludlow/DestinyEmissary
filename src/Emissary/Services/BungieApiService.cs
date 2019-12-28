@@ -13,15 +13,13 @@ namespace EmissaryCore
 {
     public class BungieApiService : IBungieApiService
     {
+        private readonly IConfiguration config;
         private HttpClient httpClient;
-        private string bungieApiKey;
 
-        public BungieApiService(HttpClient httpClient)
+        public BungieApiService(IConfiguration config, HttpClient httpClient)
         {
+            this.config = config;
             this.httpClient = httpClient;
-            this.bungieApiKey = GetBungieApiKey();
-            // this.httpClient = new HttpClient();
-            // this.httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetBungieApiKey());
         }
 
         public OAuthResponse GetOAuthAccessToken(OAuthRequest oauthRequest)
@@ -32,10 +30,10 @@ namespace EmissaryCore
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic.Add("grant_type", "authorization_code");
             dic.Add("code", oauthRequest.AuthCode);
-            dic.Add("client_id", oauthRequest.ClientId);
-            dic.Add("client_secret", oauthRequest.ClientSecret);
+            dic.Add("client_id", config["Bungie:ClientId"]);
+            dic.Add("client_secret", config["Bungie:ClientSecret"]);
             request.Content = new FormUrlEncodedContent(dic);
-            request.Content.Headers.Add("X-API-KEY", bungieApiKey);
+            request.Content.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
             // httpRequest.Content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             string json = response.Content.ReadAsStringAsync().Result;
@@ -48,7 +46,7 @@ namespace EmissaryCore
             HttpRequestMessage request = new HttpRequestMessage();
             request.RequestUri = new Uri("https://www.bungie.net/Platform/User/GetMembershipsForCurrentUser/");
             request.Method = HttpMethod.Get;
-            request.Headers.Add("X-API-KEY", bungieApiKey);
+            request.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
             request.Headers.Add("Authorization", $"Bearer {membershipsRequest.AccessToken}");
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.StatusCode == HttpStatusCode.Unauthorized) {
@@ -65,7 +63,7 @@ namespace EmissaryCore
             HttpRequestMessage request = new HttpRequestMessage();
             request.Method = HttpMethod.Get;
             request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{charactersRequest.MembershipType}/Profile/{charactersRequest.DestinyProfileId}/?components=200");
-            request.Headers.Add("X-API-KEY", bungieApiKey);
+            request.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.IsSuccessStatusCode) {
                 string json = response.Content.ReadAsStringAsync().Result;
@@ -84,7 +82,7 @@ namespace EmissaryCore
             HttpRequestMessage request = new HttpRequestMessage();
             request.Method = HttpMethod.Get;
             request.RequestUri = new Uri($"https://www.bungie.net/Platform/Destiny2/{equipmentRequest.DestinyMembershipType}/Profile/{equipmentRequest.DestinyProfileId}/Character/{equipmentRequest.DestinyCharacterId}/?components=205");
-            request.Headers.Add("X-API-KEY", bungieApiKey);
+            request.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.IsSuccessStatusCode) {
                 string json = response.Content.ReadAsStringAsync().Result;
@@ -108,7 +106,7 @@ namespace EmissaryCore
             request.Method = HttpMethod.Post;
             string contentString = JsonConvert.SerializeObject(equipRequest);
             request.Content = new StringContent(contentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("X-API-KEY", bungieApiKey);
+            request.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
             request.Headers.Add("Authorization", $"Bearer {equipRequest.AccessToken}");
             HttpResponseMessage response = httpClient.SendAsync(request).Result;
             if (response.IsSuccessStatusCode) {
@@ -145,20 +143,20 @@ namespace EmissaryCore
             return httpResponse.Content.ReadAsStreamAsync().Result;
         }
 
-        private string GetBungieApiKey()
-        {
-            string workingDirectory = Environment.CurrentDirectory;
-            string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
-            string dataDirectory = Path.Combine(solutionDirectory, "data");
-            string secretsFileName = "secrets.json";
-            IConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                .SetBasePath(dataDirectory)
-                .AddJsonFile(secretsFileName);
-            IConfiguration config = configBuilder.Build();
-            string bungieApiKeyName = "BungieApiKey";
-            string bungieApiKey = config[bungieApiKeyName];
-            return bungieApiKey;
-        }
+        // private string Getconfig["Bungie:ApiKey"]()
+        // {
+        //     string workingDirectory = Environment.CurrentDirectory;
+        //     string solutionDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+        //     string dataDirectory = Path.Combine(solutionDirectory, "data");
+        //     string secretsFileName = "secrets.json";
+        //     IConfigurationBuilder configBuilder = new ConfigurationBuilder()
+        //         .SetBasePath(dataDirectory)
+        //         .AddJsonFile(secretsFileName);
+        //     IConfiguration config = configBuilder.Build();
+        //     string config["Bungie:ApiKey"]Name = "config["Bungie:ApiKey"]";
+        //     string config["Bungie:ApiKey"] = config[config["Bungie:ApiKey"]Name];
+        //     return config["Bungie:ApiKey"];
+        // }
 
     }
 }

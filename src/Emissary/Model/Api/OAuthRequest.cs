@@ -6,14 +6,10 @@ namespace EmissaryCore
     public class OAuthRequest
     {
         public string AuthCode { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
 
-        public OAuthRequest(string authCode, string clientId, string clientSecret)
+        public OAuthRequest(string authCode)
         {
             this.AuthCode = authCode;
-            this.ClientId = clientId;
-            this.ClientSecret = clientSecret;
         }
     }
 }

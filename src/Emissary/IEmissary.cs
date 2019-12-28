@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EmissaryCore.Common
+namespace EmissaryCore
 {
     /// <summary>
     /// this is the main interface that allows the discord bot to call the actual Destiny Emissary logic. 
@@ -9,7 +9,7 @@ namespace EmissaryCore.Common
     /// </summary>
     public interface IEmissary
     {
-        Loadout CurrentlyEquipped(ulong discordId);
+        EmissaryResult CurrentlyEquipped(ulong discordId);
         EmissaryResult ListLoadouts(ulong discordId);
         EmissaryResult EquipLoadout(ulong discordId, string loadoutName);
         EmissaryResult SaveLoadout(ulong discordId, Loadout loadout, string loadoutName);
