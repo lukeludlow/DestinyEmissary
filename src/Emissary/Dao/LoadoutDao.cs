@@ -16,11 +16,8 @@ namespace EmissaryCore
 
         public IList<Loadout> GetAllLoadoutsForUser(ulong discordId)
         {
-            // IList<Loadout> loadouts = dbContext.Loadouts.Where(l => l.DiscordID == discordId)
-            //                                                 .Select(l => l.ToLoadout())
-            //                                                 .ToList();
-            // return loadouts;
-            throw new NotImplementedException();
+            IList<Loadout> loadouts = dbContext.Loadouts.Where(l => l.DiscordId == discordId).ToList();
+            return loadouts;
         }
 
         public Loadout GetLoadout(ulong discordId, long destinyCharacterId, string loadoutName)
@@ -42,12 +39,11 @@ namespace EmissaryCore
 
         public void RemoveLoadout(ulong discordId, long destinyCharacterId, string loadoutName)
         {
-            // LoadoutDbEntity loadoutEntity = dbContext.Loadouts.Find(discordId, loadoutName);
-            // if (loadoutEntity != null) {
-            //     dbContext.Loadouts.Remove(loadoutEntity);
-            //     dbContext.SaveChanges();
-            // }
-            throw new NotImplementedException();
+            Loadout foundLoadout = dbContext.Loadouts.Find(discordId, destinyCharacterId, loadoutName);
+            if (foundLoadout != null) {
+                dbContext.Loadouts.Remove(foundLoadout);
+                dbContext.SaveChanges();
+            }
         }
 
 
