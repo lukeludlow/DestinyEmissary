@@ -20,45 +20,24 @@ namespace EmissaryCore
             this.manifestPath = GetManifestPath();
         }
 
-
         public ManifestItemDefinition GetItemDefinition(uint itemHash)
         {
-            throw new NotImplementedException();
+            int itemId = ConvertHashToTableId(itemHash);
+            string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
+            string json = databaseAccessor.ExecuteCommand(commandText, manifestPath);
+            ManifestItemDefinition itemDefinition = JsonConvert.DeserializeObject<ManifestItemDefinition>(json);
+            return itemDefinition;
         }
 
         public ManifestItemCategoryDefinition GetItemCategoryDefinition(uint categoryHash)
         {
-            throw new NotImplementedException();
+            int itemCategoryId = ConvertHashToTableId(categoryHash);
+            string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
+            string json = databaseAccessor.ExecuteCommand(commandText, manifestPath);
+            ManifestItemCategoryDefinition categoryDefinition = JsonConvert.DeserializeObject<ManifestItemCategoryDefinition>(json);
+            return categoryDefinition;
         }
 
-
-
-        // public DestinyItem LookupItem(uint itemHash)
-        // {
-        //     int itemId = ConvertHashToTableId(itemHash);
-        //     string commandText = $"SELECT json FROM DestinyInventoryItemDefinition WHERE id = {itemId}";
-        //     string json = TryExecuteCommand(commandText, manifestPath);
-        //     DestinyItem item = JsonConvert.DeserializeObject<DestinyItem>(json);
-        //     return item;
-        // }
-
-        // public DestinyItemCategory LookupItemCategory(uint itemCategoryHash)
-        // {
-        //     int itemCategoryId = ConvertHashToTableId(itemCategoryHash);
-        //     string commandText = $"SELECT json FROM DestinyItemCategoryDefinition WHERE id = {itemCategoryId}";
-        //     string json = TryExecuteCommand(commandText, manifestPath);
-        //     DestinyItemCategory itemCategory = JsonConvert.DeserializeObject<DestinyItemCategory>(json);
-        //     return itemCategory;
-        // }
-
-        private string TryExecuteCommand(string commandText, string manifestPath)
-        {
-            try {
-                return databaseAccessor.ExecuteCommand(commandText, manifestPath);
-            } catch (Exception e) {
-                throw new DataAccessException(e.Message);
-            }
-        }
 
         private int ConvertHashToTableId(uint hash)
         {
@@ -68,21 +47,7 @@ namespace EmissaryCore
             return id;
         }
 
-        // private string ExecuteCommandOnManifestDatabase(string commandText)
-        // {
-        //     string dbPath = GetLocalManifestFilePath();
-        //     string queryResult = "";
-        //     using (SqliteConnection db = new SqliteConnection($"Filename={dbPath}")) {
-        //         db.Open();
-        //         SqliteCommand selectCommand = new SqliteCommand(commandText, db);
-        //         SqliteDataReader reader = selectCommand.ExecuteReader();
-        //         reader.Read();
-        //         queryResult = reader.GetString(0);
-        //         db.Close();
-        //     }
-        //     return queryResult;
-        // }
-
+        // TODO refactor this is very bad
         private string GetManifestPath()
         {
             string workingDirectory = Environment.CurrentDirectory;
@@ -92,7 +57,6 @@ namespace EmissaryCore
             string localManifestFile = Path.Combine(dataDirectory, localManifestFileName);
             return localManifestFile;
         }
-
 
 
         // TODO make it so that this checks for the latest version and downloads the new manifest only if needed

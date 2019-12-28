@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Microsoft.Data.Sqlite;
 
-
 namespace EmissaryCore
 {
     public class DatabaseAccessor : IDatabaseAccessor
@@ -13,7 +12,7 @@ namespace EmissaryCore
             try {
                 string queryResult = "";
                 if (!File.Exists(databasePath)) {
-                    throw new DataAccessException("database file does not exist");
+                    throw new DataAccessException($"database file not found. path: {databasePath}");
                 }
                 using (SqliteConnection db = new SqliteConnection($"Filename={databasePath}")) {
                     db.Open();
@@ -24,8 +23,9 @@ namespace EmissaryCore
                         queryResult = reader.GetString(0);
                         db.Close();
                     } else {
+                        queryResult = "";
                         db.Close();
-                        throw new DataAccessException("0 rows returned");
+                        // throw new DataAccessException("0 rows returned");
                     }
                 }
                 return queryResult;
