@@ -14,39 +14,29 @@ namespace EmissaryCore
             this.dbContext = context;
         }
 
-        public IList<EmissaryUser> GetUsers()
-        {
-            // return dbContext.Users.ToList();
-            throw new NotImplementedException();
-        }
-
-        // TODO return null, don't throw any exceptions
         public EmissaryUser GetUserByDiscordId(ulong discordId)
         {
-            // return dbContext.Users.Find(discordId);
-            throw new NotImplementedException();
+            return dbContext.Users.Find(discordId);
         }
 
         public void AddOrUpdateUser(EmissaryUser user)
         {
-            // EmissaryUser existingUser = dbContext.Users.Where(u => u.DiscordID == user.DiscordID).AsQueryable().FirstOrDefault();
-            // if (existingUser == null) {
-            //     dbContext.Users.Add(user);
-            // } else {
-            //     dbContext.Entry(existingUser).CurrentValues.SetValues(user);
-            // }
-            // dbContext.SaveChanges();
-            throw new NotImplementedException();
+            EmissaryUser existingUser = dbContext.Users.Where(u => u.DiscordId == user.DiscordId).FirstOrDefault();
+            if (existingUser == null) {
+                dbContext.Users.Add(user);
+            } else {
+                dbContext.Entry(existingUser).CurrentValues.SetValues(user);
+            }
+            dbContext.SaveChanges();
         }
 
         public void RemoveUser(ulong discordId)
         {
-            // EmissaryUser user = dbContext.Users.Find(discordId);
-            // if (user != null) {
-            //     dbContext.Users.Remove(user);
-            //     dbContext.SaveChanges();
-            // }
-            throw new NotImplementedException();
+            EmissaryUser user = dbContext.Users.Find(discordId);
+            if (user != null) {
+                dbContext.Users.Remove(user);
+                dbContext.SaveChanges();
+            }
         }
 
         private bool disposed = false;
