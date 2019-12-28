@@ -37,6 +37,8 @@ namespace EmissaryBot
             provider.GetRequiredService<LogService>();  
             provider.GetRequiredService<CommandHandler>();  
             provider.GetRequiredService<AuthorizationRedirectService>();
+            provider.GetRequiredService<EmissaryService>();
+            provider.GetRequiredService<PostExecutionService>();
 
             // start the startup service which actually runs the bot
             await provider.GetRequiredService<StartupService>().StartAsync();  
@@ -53,6 +55,7 @@ namespace EmissaryBot
                     .AddSingleton<CommandHandler>()
                     .AddSingleton<AuthorizationRedirectService>()
                     .AddSingleton<StartupService>()
+                    .AddSingleton<PostExecutionService>()
                     .AddSingleton<EmissaryService>()
                     .AddSingleton(Configuration);
         }

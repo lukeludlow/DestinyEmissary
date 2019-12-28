@@ -20,12 +20,14 @@ namespace EmissaryBot
         private readonly HttpListener httpListener;
         private readonly LogService log;
         private string pageData;
+        private readonly EmissaryService emissaryService;
 
-        public AuthorizationRedirectService(HttpListener httpListener, LogService log)
+        public AuthorizationRedirectService(HttpListener httpListener, LogService log, EmissaryService emissaryService)
         {
             this.httpListener = httpListener;
             this.log = log;
             this.pageData = "<!DOCTYPE><html><body><p>success! you can close this window and return to discord</p></body></html>";
+            this.emissaryService = emissaryService;
         }
 
         public async Task StartAsync()
@@ -51,25 +53,13 @@ namespace EmissaryBot
                     return;
                 }
                 LogRequestInfo(context.Request);
-                WriteResponse(context.Response);
 
-                // authorization url to send to user:
-                // https://www.bungie.net/en/OAuth/Authorize?client_id=30910&response_type=code
-
-                // client_id = "30910";
-                // state = discordUser.Id;
                 // GET https://www.bungie.net/en/oauth/authorize?client_id=30910&response_type=code&state=221313820847636491
 
-                // once i've received the code,
-                // "sending authentication code to emissary authentication service"
-                // then Emissary handles all the rest (POST request and storing tokens and stuff)
+                await log.LogAsync(new LogMessage(LogSeverity.Info, "HttpListenerService", "passing authorization code to emissary auth service"));
+                emissaryService.RegisterOrReauthorize(context.Request.QueryString["state"], context.Request.QueryString["code"]);
 
-                await log.LogAsync(new LogMessage(LogSeverity.Verbose, "HttpListenerService", "TODO passing authorization code to emissary auth service"));
-
-                // TODO read the state parameter!!! i will set the state param to be the user's discord id
-                // request.QueryString["code"]
-                // request.QueryString["state"]  (the user's discord id)
-
+                WriteResponse(context.Response);
             }
         }
 

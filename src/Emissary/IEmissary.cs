@@ -12,6 +12,7 @@ namespace EmissaryCore
         EmissaryResult CurrentlyEquipped(ulong discordId);
         EmissaryResult ListLoadouts(ulong discordId);
         EmissaryResult EquipLoadout(ulong discordId, string loadoutName);
+        EmissaryResult SaveCurrentlyEquippedAsLoadout(ulong discordId, string loadoutName);
         EmissaryResult SaveLoadout(ulong discordId, Loadout loadout, string loadoutName);
         string DeleteLoadout(ulong discordId, string loadoutName);
         EmissaryResult RegisterOrReauthorize(ulong discordId, string authCode);

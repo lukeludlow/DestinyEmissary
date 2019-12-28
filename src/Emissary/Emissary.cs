@@ -6,6 +6,8 @@ using Microsoft.Data.Sqlite;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmissaryCore
 {
@@ -29,19 +31,28 @@ namespace EmissaryCore
             this.loadoutDao = loadoutDao;
         }
 
-        public Emissary(IConfiguration config, IServiceProvider services)
+        public static Emissary Startup(IConfiguration config)
         {
-            this.config = config;
-            this.bungieApiService = services.GetRequiredService<BungieApiService>();
-            this.manifestDao = services.GetRequiredService<ManifestDao>();
-            this.dbContext = services.GetRequiredService<EmissaryDbContext>();
-            this.userDao = services.GetRequiredService<UserDao>();
-            this.loadoutDao = services.GetRequiredService<LoadoutDao>();
+            IBungieApiService bungieApiService = new BungieApiService(config, new HttpClient());
+            IManifestDao manifestDao = new ManifestDao(config, new DatabaseAccessor());
+            SqliteConnection sqliteConnection = new SqliteConnection($"DataSource={config["Emissary:DatabasePath"]}");
+            sqliteConnection.Open();
+            DbContextOptions<EmissaryDbContext> dbContextOptions = new DbContextOptionsBuilder<EmissaryDbContext>()
+                .UseSqlite(sqliteConnection)
+                .Options;
+            EmissaryDbContext dbContext = new EmissaryDbContext(dbContextOptions);
+            dbContext.Database.EnsureCreated();
+            IUserDao userDao = new UserDao(dbContext);
+            ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
+            return new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
         }
 
         public EmissaryResult CurrentlyEquipped(ulong discordId)
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            if (user == null) {
+                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
+            }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             CharacterEquipmentRequest equipmentRequest = new CharacterEquipmentRequest(user.DestinyMembershipType, user.DestinyProfileId, destinyCharacterId);
             CharacterEquipmentResponse equipmentResponse = bungieApiService.GetCharacterEquipment(equipmentRequest);
@@ -69,7 +80,7 @@ namespace EmissaryCore
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
             if (user == null) {
-                return EmissaryResult.FromError("user not found. please register with destiny emissary to use this service. TODO registration instructions");
+                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             IList<Loadout> loadouts = loadoutDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
@@ -81,7 +92,7 @@ namespace EmissaryCore
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
             if (user == null) {
-                return EmissaryResult.FromError("user not found. please register with destiny emissary to use this service. TODO registration instructions");
+                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             Loadout loadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
@@ -91,17 +102,26 @@ namespace EmissaryCore
             try {
                 equipResponse = bungieApiService.EquipItems(equipRequest);
             } catch (BungieApiException e) {
-                return EmissaryResult.FromError(e.Message);
+                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
             }
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
                 result = EmissaryResult.FromSuccess("");
             } else {
-                result = EmissaryResult.FromError("some items could not be equipped. TODO use error codes to further explain");
+                result = EmissaryResult.FromError(EmissaryErrorCodes.Undefined, "some items could not be equipped. TODO use error codes to further explain");
             }
             return result;
         }
 
+        // TODO finalize and test this
+        public EmissaryResult SaveCurrentlyEquippedAsLoadout(ulong discordId, string loadoutName)
+        {
+            Loadout loadoutToSave = JsonConvert.DeserializeObject<Loadout>(CurrentlyEquipped(discordId).Message);
+            SaveLoadout(discordId, loadoutToSave, loadoutName);
+            return EmissaryResult.FromSuccess("");
+        }
+
+        // TODO should this be private? idk
         public EmissaryResult SaveLoadout(ulong discordId, Loadout loadout, string loadoutName)
         {
             loadout.DiscordId = discordId;
@@ -110,7 +130,7 @@ namespace EmissaryCore
                 loadoutDao.AddOrUpdateLoadout(loadout);
                 return EmissaryResult.FromSuccess("");
             } catch (Exception e) {
-                return EmissaryResult.FromError(e.Message);
+                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
             }
         }
 
@@ -126,7 +146,7 @@ namespace EmissaryCore
                 OAuthRequest refreshOAuthRequest = new OAuthRequest(authCode);
                 OAuthResponse refreshOAuthResponse = bungieApiService.GetOAuthAccessToken(refreshOAuthRequest);
                 if (string.IsNullOrWhiteSpace(refreshOAuthResponse.AccessToken)) {
-                    return EmissaryResult.FromError(refreshOAuthResponse.ErrorMessage);
+                    return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, refreshOAuthResponse.ErrorMessage);
                 }
                 existingUser.BungieAccessToken = refreshOAuthResponse.AccessToken;
                 userDao.AddOrUpdateUser(existingUser);
@@ -137,7 +157,7 @@ namespace EmissaryCore
             OAuthRequest oauthRequest = new OAuthRequest(authCode);
             OAuthResponse oauthResponse = bungieApiService.GetOAuthAccessToken(oauthRequest);
             if (string.IsNullOrWhiteSpace(oauthResponse.AccessToken)) {
-                return EmissaryResult.FromError(oauthResponse.ErrorMessage);
+                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, oauthResponse.ErrorMessage);
             }
             newUser.BungieAccessToken = oauthResponse.AccessToken;
             UserMembershipsRequest membershipsRequest = new UserMembershipsRequest(oauthResponse.AccessToken);

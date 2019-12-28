@@ -69,8 +69,6 @@ namespace EmissaryTests
             Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
             // just an old example auth code. let's pretend this code expired or was already used
             string authCode = "15bf7985a28208b83997b090302b36a7";
-            string clientId = "69420";
-            string clientSecret = "X.69-x";
             string content = $"grant_type=authorization_code&code={authCode}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
             string responseString = TestUtils.ReadFile("OAuth-invalid-auth-code.json");
             Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);

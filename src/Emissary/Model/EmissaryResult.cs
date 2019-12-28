@@ -9,6 +9,7 @@ namespace EmissaryCore
         public string Message { get; set; }
         public bool Success { get; set; }
         public string ErrorMessage { get; set; }
+        public int ErrorCode { get; set; }
 
         public EmissaryResult(CommandError? error, string reason) 
             : base(error, reason)
@@ -21,15 +22,17 @@ namespace EmissaryCore
             result.Message = message;
             result.Success = true;
             result.ErrorMessage = "";
+            result.ErrorCode = EmissaryErrorCodes.None;
             return result;
         }
 
-        public static EmissaryResult FromError(string reason)
+        public static EmissaryResult FromError(int emissaryErrorCode, string reason)
         {
             EmissaryResult result = new EmissaryResult(CommandError.Unsuccessful, reason);
             result.Message = "";
             result.Success = false;
             result.ErrorMessage = reason;
+            result.ErrorCode = emissaryErrorCode;
             return result;
         }
     }
