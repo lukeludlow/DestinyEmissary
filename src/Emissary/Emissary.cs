@@ -107,7 +107,7 @@ namespace EmissaryCore
             }
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
-                result = EmissaryResult.FromSuccess(loadout.ToString());
+                result = EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } else {
                 result = EmissaryResult.FromError(EmissaryErrorCodes.Undefined, "some items could not be equipped. TODO use error codes to further explain");
             }
@@ -128,7 +128,7 @@ namespace EmissaryCore
             loadout.LoadoutName = loadoutName;
             try {
                 loadoutDao.AddOrUpdateLoadout(loadout);
-                return EmissaryResult.FromSuccess(loadout.ToString());
+                return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } catch (Exception e) {
                 return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
             }
