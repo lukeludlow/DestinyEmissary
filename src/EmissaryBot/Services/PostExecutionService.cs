@@ -39,32 +39,7 @@ namespace EmissaryBot
 
         private async Task HandleSuccessEmissaryResult(Optional<CommandInfo> commandInfo, ICommandContext context, EmissaryResult result)
         {
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.WithThumbnailUrl(context.User.GetAvatarUrl());
-            eb.WithColor(Color.Blue);
-            switch (commandInfo.Value.Name) {
-                case "list":
-                    eb.WithTitle($"{context.User.Username}'s saved loadouts");
-                    eb.WithDescription(result.Message);
-                    break;
-                case "current":
-                    eb.WithTitle($"{context.User.Username}'s currently equipped items");
-                    eb.WithDescription(result.Message);
-                    break;
-                case "save":
-                    eb.WithTitle($"successfully saved loadout");
-                    eb.WithDescription(result.Message);
-                    break;
-                case "equip":
-                    eb.WithTitle($"successfully equipped loadout");
-                    eb.WithDescription(result.Message);
-                    break;
-                default:
-                    eb.WithTitle($"success");
-                    eb.WithDescription("");
-                    break;
-            }
-            Embed embedMessage = eb.Build();
+            Embed embedMessage = DiscordEmbedTransformService.EmissaryResultToDiscordEmbed(commandInfo, context, result);
             await context.Channel.SendMessageAsync(embed: embedMessage);
             // if (successMessage.Length > 2000) {
             // successMessage = Truncate(successMessage, 2000);
@@ -83,7 +58,7 @@ namespace EmissaryBot
                 await TellUserToRegisterOrReauthorize(context);
                 await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", $"telling user to register or reauthorize using link {GetNewOAuthLinkForUser(context.User)}"));
             } else {
-                string errorMessage = $"an unexpected error occurred. {result.ErrorMessage}";
+                string errorMessage = $"error: {result.ErrorMessage}";
                 await context.Channel.SendMessageAsync(errorMessage);
                 await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", errorMessage));
             }

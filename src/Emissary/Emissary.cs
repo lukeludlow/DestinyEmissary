@@ -75,7 +75,7 @@ namespace EmissaryCore
                 }
             }
             currentlyEquipped.Items = items;
-            return EmissaryResult.FromSuccess(currentlyEquipped.ToString());
+            return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(currentlyEquipped));
         }
 
         public EmissaryResult ListLoadouts(ulong discordId)
@@ -86,11 +86,7 @@ namespace EmissaryCore
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             IList<Loadout> loadouts = loadoutDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
-            StringBuilder sb = new StringBuilder();
-            foreach (Loadout loadout in loadouts) {
-                sb.Append(loadout.ToString());
-            };
-            return EmissaryResult.FromSuccess(sb.ToString());
+            return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadouts));
         }
 
         public EmissaryResult EquipLoadout(ulong discordId, string loadoutName)
