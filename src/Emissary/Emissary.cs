@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace EmissaryCore
 {
@@ -74,8 +75,7 @@ namespace EmissaryCore
                 }
             }
             currentlyEquipped.Items = items;
-            string currentlyEquippedMessage = JsonConvert.SerializeObject(currentlyEquipped);
-            return EmissaryResult.FromSuccess(currentlyEquippedMessage);
+            return EmissaryResult.FromSuccess(currentlyEquipped.ToString());
         }
 
         public EmissaryResult ListLoadouts(ulong discordId)
@@ -86,8 +86,11 @@ namespace EmissaryCore
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             IList<Loadout> loadouts = loadoutDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
-            string loadoutsMessage = JsonConvert.SerializeObject(loadouts);
-            return EmissaryResult.FromSuccess(loadoutsMessage);
+            StringBuilder sb = new StringBuilder();
+            foreach (Loadout loadout in loadouts) {
+                sb.Append(loadout.ToString());
+            };
+            return EmissaryResult.FromSuccess(sb.ToString());
         }
 
         public EmissaryResult EquipLoadout(ulong discordId, string loadoutName)
@@ -108,7 +111,7 @@ namespace EmissaryCore
             }
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
-                result = EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
+                result = EmissaryResult.FromSuccess(loadout.ToString());
             } else {
                 result = EmissaryResult.FromError(EmissaryErrorCodes.Undefined, "some items could not be equipped. TODO use error codes to further explain");
             }
@@ -129,7 +132,7 @@ namespace EmissaryCore
             loadout.LoadoutName = loadoutName;
             try {
                 loadoutDao.AddOrUpdateLoadout(loadout);
-                return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
+                return EmissaryResult.FromSuccess(loadout.ToString());
             } catch (Exception e) {
                 return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
             }

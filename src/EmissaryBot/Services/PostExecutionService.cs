@@ -39,36 +39,43 @@ namespace EmissaryBot
 
         private async Task HandleSuccessEmissaryResult(Optional<CommandInfo> commandInfo, ICommandContext context, EmissaryResult result)
         {
-            if (commandInfo.Value.Name == "list") {
-                IList<Loadout> loadouts = JsonConvert.DeserializeObject<List<Loadout>>(result.Message);
-                Embed embedMessage = DiscordMessageTransformService.LoadoutsListToDiscordEmbed(context.Client.CurrentUser, context.User, loadouts);
-                await context.Channel.SendMessageAsync(embed: embedMessage);
-                return;
-            } else if (commandInfo.Value.Name == "current") {
-                Embed embedMessage = DiscordMessageTransformService.CurrentlyEquippedToDiscordEmbed(context, result);
-                await context.Channel.SendMessageAsync(embed: embedMessage);
-                return;
-            } else if (commandInfo.Value.Name == "save") {
-                Embed embedMessage = DiscordMessageTransformService.SaveLoadoutToDiscordEmbed(context, result);
-                await context.Channel.SendMessageAsync(embed: embedMessage);
-                return;
-            } else if (commandInfo.Value.Name == "equip") {
-                Embed embedMessage = DiscordMessageTransformService.EquipLoadoutToDiscordEmbed(context, result);
-                await context.Channel.SendMessageAsync(embed: embedMessage);
-                return;
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.WithThumbnailUrl(context.User.GetAvatarUrl());
+            eb.WithColor(Color.Blue);
+            switch (commandInfo.Value.Name) {
+                case "list":
+                    eb.WithTitle($"{context.User.Username}'s saved loadouts");
+                    eb.WithDescription(result.Message);
+                    break;
+                case "current":
+                    eb.WithTitle($"{context.User.Username}'s currently equipped items");
+                    eb.WithDescription(result.Message);
+                    break;
+                case "save":
+                    eb.WithTitle($"successfully saved loadout");
+                    eb.WithDescription(result.Message);
+                    break;
+                case "equip":
+                    eb.WithTitle($"successfully equipped loadout");
+                    eb.WithDescription(result.Message);
+                    break;
+                default:
+                    eb.WithTitle($"success");
+                    eb.WithDescription("");
+                    break;
             }
-            string successMessage = $"success{(string.IsNullOrWhiteSpace(result.Message) ? "" : $":\n{result.Message}")}";
-            if (successMessage.Length > 2000) {
-                successMessage = Truncate(successMessage, 2000);
-            }
-            await context.Channel.SendMessageAsync(successMessage);
+            Embed embedMessage = eb.Build();
+            await context.Channel.SendMessageAsync(embed: embedMessage);
+            // if (successMessage.Length > 2000) {
+            // successMessage = Truncate(successMessage, 2000);
+            // }
             // await logService.LogAsync(new LogMessage(LogSeverity.Info, "PostExecutionService", successMessage));
         }
 
-        private string Truncate(string value, int maxChars)
-        {
-            return value.Length <= maxChars ? value : value.Substring(0, maxChars-4) + "\n...";
-        }
+        // private string Truncate(string value, int maxChars)
+        // {
+        //     return value.Length <= maxChars ? value : value.Substring(0, maxChars - 4) + "\n...";
+        // }
 
         private async Task HandleErrorEmissaryResult(ICommandContext context, EmissaryResult result)
         {
@@ -80,6 +87,10 @@ namespace EmissaryBot
                 await context.Channel.SendMessageAsync(errorMessage);
                 await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", errorMessage));
             }
+        }
+
+        public void TellUserToRegisterOrReauthorizeCallback(ulong discordId)
+        {
         }
 
         private async Task TellUserToRegisterOrReauthorize(ICommandContext context)
