@@ -69,7 +69,9 @@ namespace EmissaryCore
                 item.Name = manifestItemDefinition.DisplayName;
                 item.CategoryHashes = manifestItemDefinition.ItemCategoryHashes;
                 item.Categories = item.CategoryHashes.Select(hash => manifestDao.GetItemCategoryDefinition(hash).CategoryName).ToList();
-                items.Add(item);
+                if (item.Categories.Contains("Weapon") || item.Categories.Contains("Armor")) {
+                    items.Add(item);
+                }
             }
             currentlyEquipped.Items = items.ToArray();
             string currentlyEquippedMessage = JsonConvert.SerializeObject(currentlyEquipped);

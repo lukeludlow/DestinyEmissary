@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using EmissaryCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace EmissaryBot
 {
@@ -25,7 +27,7 @@ namespace EmissaryBot
             switch (result) {
                 case EmissaryResult emissaryResult:
                     if (emissaryResult.Success) {
-                        await HandleSuccessEmissaryResult(context, emissaryResult);
+                        await HandleSuccessEmissaryResult(commandInfo, context, emissaryResult);
                     } else {
                         await HandleErrorEmissaryResult(context, emissaryResult);
                     }
@@ -35,11 +37,25 @@ namespace EmissaryBot
             }
         }
 
-        private async Task HandleSuccessEmissaryResult(ICommandContext context, EmissaryResult result)
+        private async Task HandleSuccessEmissaryResult(Optional<CommandInfo> commandInfo, ICommandContext context, EmissaryResult result)
         {
-            string successMessage = $"success{(string.IsNullOrWhiteSpace(result.Message) ? "" : ":\n{emissaryResult.Message}")}";
+            if (commandInfo.IsSpecified && commandInfo.Value.Name == "list") {
+                IList<Loadout> loadouts = JsonConvert.DeserializeObject<List<Loadout>>(result.Message);
+                Embed embedMessage = DiscordMessageTransformService.LoadoutsListToDiscordEmbed(context.User.Username, loadouts);
+                await context.Channel.SendMessageAsync(embed: embedMessage);
+                return;
+            }
+            string successMessage = $"success{(string.IsNullOrWhiteSpace(result.Message) ? "" : $":\n{result.Message}")}";
+            if (successMessage.Length > 2000) {
+                successMessage = Truncate(successMessage, 2000);
+            }
             await context.Channel.SendMessageAsync(successMessage);
-            await logService.LogAsync(new LogMessage(LogSeverity.Info, "PostExecutionService", successMessage));
+            // await logService.LogAsync(new LogMessage(LogSeverity.Info, "PostExecutionService", successMessage));
+        }
+
+        private string Truncate(string value, int maxChars)
+        {
+            return value.Length <= maxChars ? value : value.Substring(0, maxChars-4) + "\n...";
         }
 
         private async Task HandleErrorEmissaryResult(ICommandContext context, EmissaryResult result)
