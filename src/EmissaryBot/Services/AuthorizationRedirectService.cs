@@ -57,7 +57,7 @@ namespace EmissaryBot
                 // GET https://www.bungie.net/en/oauth/authorize?client_id=30910&response_type=code&state=221313820847636491
 
                 await log.LogAsync(new LogMessage(LogSeverity.Info, "HttpListenerService", "passing authorization code to emissary auth service"));
-                emissaryService.RegisterOrReauthorize(context.Request.QueryString["state"], context.Request.QueryString["code"]);
+                await emissaryService.RegisterOrReauthorize(context.Request.QueryString["state"], context.Request.QueryString["code"]);
 
                 WriteResponse(context.Response);
             }

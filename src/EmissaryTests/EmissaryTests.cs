@@ -195,14 +195,14 @@ namespace EmissaryTests
             // x.GetCharacterEquipment(equipmentRequest) == equipmentResponse
             // );
 
-            ManifestItemDefinition perfectParadoxItemDefinition = new ManifestItemDefinition("Perfect Paradox", new List<uint>());
-            ManifestItemDefinition suddenDeathItemDefinition = new ManifestItemDefinition("A Sudden Death", new List<uint>());
-            ManifestItemDefinition apexPredatorItemDefinition = new ManifestItemDefinition("Apex Predator", new List<uint>());
-            ManifestItemDefinition maskOfRullItemDefinition = new ManifestItemDefinition("Mask of Rull", new List<uint>());
-            ManifestItemDefinition reverieDawnGauntletsItemDefinition = new ManifestItemDefinition("Reverie Dawn Gauntlets", new List<uint>());
-            ManifestItemDefinition plateOfTranscendenceItemDefinition = new ManifestItemDefinition("Plate of Transcendence", new List<uint>());
-            ManifestItemDefinition peacekeepersItemDefinition = new ManifestItemDefinition("Peacekeepers", new List<uint>());
-            ManifestItemDefinition markOfTheGreatHuntItemDefinition = new ManifestItemDefinition("Mark of the Great Hunt", new List<uint>());
+            ManifestItemDefinition perfectParadoxItemDefinition = new ManifestItemDefinition("Perfect Paradox", new List<uint>(){1, 2});
+            ManifestItemDefinition suddenDeathItemDefinition = new ManifestItemDefinition("A Sudden Death", new List<uint>(){1, 3});
+            ManifestItemDefinition apexPredatorItemDefinition = new ManifestItemDefinition("Apex Predator", new List<uint>(){1, 4});
+            ManifestItemDefinition maskOfRullItemDefinition = new ManifestItemDefinition("Mask of Rull", new List<uint>(){20});
+            ManifestItemDefinition reverieDawnGauntletsItemDefinition = new ManifestItemDefinition("Reverie Dawn Gauntlets", new List<uint>(){20});
+            ManifestItemDefinition plateOfTranscendenceItemDefinition = new ManifestItemDefinition("Plate of Transcendence", new List<uint>(){20});
+            ManifestItemDefinition peacekeepersItemDefinition = new ManifestItemDefinition("Peacekeepers", new List<uint>(){20});
+            ManifestItemDefinition markOfTheGreatHuntItemDefinition = new ManifestItemDefinition("Mark of the Great Hunt", new List<uint>(){20});
             ManifestItemDefinition starMapShellItemDefinition = new ManifestItemDefinition("Star Map Shell", new List<uint>());
             ManifestItemDefinition soloStandSparrowItemDefinition = new ManifestItemDefinition("Solo Stand", new List<uint>());
             ManifestItemDefinition safePassageItemDefinition = new ManifestItemDefinition("Safe Passage", new List<uint>());
@@ -230,9 +230,11 @@ namespace EmissaryTests
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(emoteHash)).Returns(emotesItemDefinition);
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(lanternOfOsirisHash)).Returns(lanternOfOsirisItemDefinition);
 
-            // Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(1)).Returns(new ManifestItemCategoryDefinition("Weapon"));
-            // Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
-            // Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(10)).Returns(new ManifestItemCategoryDefinition("Sniper Rifle"));
+            Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(1)).Returns(new ManifestItemCategoryDefinition("Weapon"));
+            Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
+            Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(3)).Returns(new ManifestItemCategoryDefinition("Energy Weapon"));
+            Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(4)).Returns(new ManifestItemCategoryDefinition("Power Weapon"));
+            Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(20)).Returns(new ManifestItemCategoryDefinition("Armor"));
 
             IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
 
@@ -242,7 +244,9 @@ namespace EmissaryTests
             Assert.AreEqual(discordId, loadoutResult.DiscordId);
             Assert.AreEqual(titan.CharacterId, loadoutResult.DestinyCharacterId);
             Assert.IsFalse(string.IsNullOrWhiteSpace(loadoutResult.LoadoutName));
-            Assert.AreEqual(17, loadoutResult.Items.Count);
+            // Assert.AreEqual(17, loadoutResult.Items.Count);
+            // it should only return 8 items, because now we only pay attention to weapons and armor
+            Assert.AreEqual(8, loadoutResult.Items.Count);
             Assert.AreEqual("Perfect Paradox", loadoutResult.Items[0].Name);
             Assert.AreEqual("A Sudden Death", loadoutResult.Items[1].Name);
         }

@@ -73,7 +73,7 @@ namespace EmissaryCore
                     items.Add(item);
                 }
             }
-            currentlyEquipped.Items = items.ToArray();
+            currentlyEquipped.Items = items;
             string currentlyEquippedMessage = JsonConvert.SerializeObject(currentlyEquipped);
             return EmissaryResult.FromSuccess(currentlyEquippedMessage);
         }
@@ -108,7 +108,7 @@ namespace EmissaryCore
             }
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
-                result = EmissaryResult.FromSuccess("");
+                result = EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } else {
                 result = EmissaryResult.FromError(EmissaryErrorCodes.Undefined, "some items could not be equipped. TODO use error codes to further explain");
             }
@@ -119,8 +119,7 @@ namespace EmissaryCore
         public EmissaryResult SaveCurrentlyEquippedAsLoadout(ulong discordId, string loadoutName)
         {
             Loadout loadoutToSave = JsonConvert.DeserializeObject<Loadout>(CurrentlyEquipped(discordId).Message);
-            SaveLoadout(discordId, loadoutToSave, loadoutName);
-            return EmissaryResult.FromSuccess("");
+            return SaveLoadout(discordId, loadoutToSave, loadoutName);
         }
 
         // TODO should this be private? idk
@@ -130,7 +129,7 @@ namespace EmissaryCore
             loadout.LoadoutName = loadoutName;
             try {
                 loadoutDao.AddOrUpdateLoadout(loadout);
-                return EmissaryResult.FromSuccess("");
+                return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } catch (Exception e) {
                 return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
             }

@@ -39,9 +39,21 @@ namespace EmissaryBot
 
         private async Task HandleSuccessEmissaryResult(Optional<CommandInfo> commandInfo, ICommandContext context, EmissaryResult result)
         {
-            if (commandInfo.IsSpecified && commandInfo.Value.Name == "list") {
+            if (commandInfo.Value.Name == "list") {
                 IList<Loadout> loadouts = JsonConvert.DeserializeObject<List<Loadout>>(result.Message);
-                Embed embedMessage = DiscordMessageTransformService.LoadoutsListToDiscordEmbed(context.User.Username, loadouts);
+                Embed embedMessage = DiscordMessageTransformService.LoadoutsListToDiscordEmbed(context.Client.CurrentUser, context.User, loadouts);
+                await context.Channel.SendMessageAsync(embed: embedMessage);
+                return;
+            } else if (commandInfo.Value.Name == "current") {
+                Embed embedMessage = DiscordMessageTransformService.CurrentlyEquippedToDiscordEmbed(context, result);
+                await context.Channel.SendMessageAsync(embed: embedMessage);
+                return;
+            } else if (commandInfo.Value.Name == "save") {
+                Embed embedMessage = DiscordMessageTransformService.SaveLoadoutToDiscordEmbed(context, result);
+                await context.Channel.SendMessageAsync(embed: embedMessage);
+                return;
+            } else if (commandInfo.Value.Name == "equip") {
+                Embed embedMessage = DiscordMessageTransformService.EquipLoadoutToDiscordEmbed(context, result);
                 await context.Channel.SendMessageAsync(embed: embedMessage);
                 return;
             }
