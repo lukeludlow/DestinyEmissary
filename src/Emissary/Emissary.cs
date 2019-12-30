@@ -22,6 +22,9 @@ namespace EmissaryCore
         private readonly IUserDao userDao;
         private readonly ILoadoutDao loadoutDao;
 
+        public event Action<ulong> RequestAuthorizationEvent;
+
+
         public Emissary(IConfiguration config, IBungieApiService bungieApiService, IManifestDao manifestAccessor, EmissaryDbContext dbContext, IUserDao userDao, ILoadoutDao loadoutDao)
         {
             this.config = config;
@@ -52,7 +55,8 @@ namespace EmissaryCore
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
             if (user == null) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
+                RequestAuthorizationEvent?.Invoke(discordId);
+                return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             CharacterEquipmentRequest equipmentRequest = new CharacterEquipmentRequest(user.DestinyMembershipType, user.DestinyProfileId, destinyCharacterId);
@@ -61,28 +65,38 @@ namespace EmissaryCore
             currentlyEquipped.DiscordId = user.DiscordId;
             currentlyEquipped.DestinyCharacterId = destinyCharacterId;
             currentlyEquipped.LoadoutName = "currently equipped";
-            List<DestinyItem> items = new List<DestinyItem>();
-            foreach (DestinyGenericItem genericItem in equipmentResponse.Items) {
-                DestinyItem item = new DestinyItem();
-                item.ItemHash = genericItem.ItemHash;
-                item.ItemInstanceId = genericItem.ItemInstanceId;
-                ManifestItemDefinition manifestItemDefinition = manifestDao.GetItemDefinition(genericItem.ItemHash);
-                item.Name = manifestItemDefinition.DisplayName;
-                item.CategoryHashes = manifestItemDefinition.ItemCategoryHashes;
-                item.Categories = item.CategoryHashes.Select(hash => manifestDao.GetItemCategoryDefinition(hash).CategoryName).ToList();
-                if (item.Categories.Contains("Weapon") || item.Categories.Contains("Armor")) {
-                    items.Add(item);
-                }
-            }
-            currentlyEquipped.Items = items;
+            currentlyEquipped.Items = equipmentResponse.Items
+                    .Select(genericItem => CreateDestinyItemFromGenericItem(genericItem))
+                    .Where(item => ItemIsWeaponOrArmor(item))
+                    .ToList();
             return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(currentlyEquipped));
+        }
+
+        private bool ItemIsWeaponOrArmor(DestinyItem item)
+        {
+            return item.Categories.Contains("Weapon") || item.Categories.Contains("Armor");
+        }
+
+        private DestinyItem CreateDestinyItemFromGenericItem(DestinyGenericItem genericItem)
+        {
+            DestinyItem item = new DestinyItem();
+            item.ItemHash = genericItem.ItemHash;
+            item.ItemInstanceId = genericItem.ItemInstanceId;
+            ManifestItemDefinition manifestItemDefinition = manifestDao.GetItemDefinition(genericItem.ItemHash);
+            item.Name = manifestItemDefinition.DisplayName;
+            item.CategoryHashes = manifestItemDefinition.ItemCategoryHashes;
+            item.Categories = item.CategoryHashes
+                    .Select(hash => manifestDao.GetItemCategoryDefinition(hash).CategoryName)
+                    .ToList();
+            return item;
         }
 
         public EmissaryResult ListLoadouts(ulong discordId)
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
             if (user == null) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
+                RequestAuthorizationEvent?.Invoke(discordId);
+                return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             IList<Loadout> loadouts = loadoutDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
@@ -93,7 +107,8 @@ namespace EmissaryCore
         {
             EmissaryUser user = userDao.GetUserByDiscordId(discordId);
             if (user == null) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.UserNotFound, "user not found. please register with destiny emissary to use this service.");
+                RequestAuthorizationEvent?.Invoke(discordId);
+                return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             Loadout loadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
@@ -103,13 +118,13 @@ namespace EmissaryCore
             try {
                 equipResponse = bungieApiService.EquipItems(equipRequest);
             } catch (BungieApiException e) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
+                return EmissaryResult.FromError(e.Message);
             }
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
                 result = EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } else {
-                result = EmissaryResult.FromError(EmissaryErrorCodes.Undefined, "some items could not be equipped. TODO use error codes to further explain");
+                result = EmissaryResult.FromError("some items could not be equipped. TODO use error codes to further explain");
             }
             return result;
         }
@@ -130,7 +145,7 @@ namespace EmissaryCore
                 loadoutDao.AddOrUpdateLoadout(loadout);
                 return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } catch (Exception e) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, e.Message);
+                return EmissaryResult.FromError(e.Message);
             }
         }
 
@@ -146,7 +161,7 @@ namespace EmissaryCore
                 OAuthRequest refreshOAuthRequest = new OAuthRequest(authCode);
                 OAuthResponse refreshOAuthResponse = bungieApiService.GetOAuthAccessToken(refreshOAuthRequest);
                 if (string.IsNullOrWhiteSpace(refreshOAuthResponse.AccessToken)) {
-                    return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, refreshOAuthResponse.ErrorMessage);
+                    return EmissaryResult.FromError(refreshOAuthResponse.ErrorMessage);
                 }
                 existingUser.BungieAccessToken = refreshOAuthResponse.AccessToken;
                 userDao.AddOrUpdateUser(existingUser);
@@ -157,7 +172,7 @@ namespace EmissaryCore
             OAuthRequest oauthRequest = new OAuthRequest(authCode);
             OAuthResponse oauthResponse = bungieApiService.GetOAuthAccessToken(oauthRequest);
             if (string.IsNullOrWhiteSpace(oauthResponse.AccessToken)) {
-                return EmissaryResult.FromError(EmissaryErrorCodes.Undefined, oauthResponse.ErrorMessage);
+                return EmissaryResult.FromError(oauthResponse.ErrorMessage);
             }
             newUser.BungieAccessToken = oauthResponse.AccessToken;
             UserMembershipsRequest membershipsRequest = new UserMembershipsRequest(oauthResponse.AccessToken);

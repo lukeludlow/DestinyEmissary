@@ -86,7 +86,7 @@ namespace EmissaryTests
         }
 
         [TestMethod]
-        public void CurrentlyEquipped_UserNotRegisteredYet_ShouldThrowUserNotFoundException()
+        public void CurrentlyEquipped_UserNotRegisteredYet_ShouldEmitRequestAuthorizationEvent()
         {
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
@@ -95,9 +95,12 @@ namespace EmissaryTests
             ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
             IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            bool eventEmitted = false; 
+            emissary.RequestAuthorizationEvent += (discordId) => eventEmitted = true;
             ulong discordId = 221313820847636491;
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Throws(new UserNotFoundException());
-            Assert.ThrowsException<UserNotFoundException>(() => emissary.CurrentlyEquipped(discordId));
+            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(value: null);
+            EmissaryResult result = emissary.CurrentlyEquipped(discordId);
+            Assert.IsTrue(eventEmitted);
         }
 
         [TestMethod]
@@ -741,7 +744,7 @@ namespace EmissaryTests
             EmissaryResult result = emissary.ListLoadouts(discordId);
 
             Assert.IsFalse(result.Success);
-            Assert.IsTrue(result.ErrorMessage.Contains("user not found"));
+            // Assert.IsTrue(result.ErrorMessage.Contains("user not found"));
         }
 
         [TestMethod]

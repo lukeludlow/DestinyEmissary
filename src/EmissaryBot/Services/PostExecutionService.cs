@@ -54,34 +54,12 @@ namespace EmissaryBot
 
         private async Task HandleErrorEmissaryResult(ICommandContext context, EmissaryResult result)
         {
-            if (result.ErrorCode == EmissaryErrorCodes.UserNotFound) {
-                await TellUserToRegisterOrReauthorize(context);
-                await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", $"telling user to register or reauthorize using link {GetNewOAuthLinkForUser(context.User)}"));
-            } else {
-                string errorMessage = $"error: {result.ErrorMessage}";
-                await context.Channel.SendMessageAsync(errorMessage);
-                await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", errorMessage));
-            }
+            string errorMessage = $"{result.ErrorMessage}";
+            await context.Channel.SendMessageAsync(errorMessage);
+            await logService.LogAsync(new LogMessage(LogSeverity.Error, "PostExecutionService", $"{errorMessage}"));
         }
 
-        public void TellUserToRegisterOrReauthorizeCallback(ulong discordId)
-        {
-        }
 
-        private async Task TellUserToRegisterOrReauthorize(ICommandContext context)
-        {
-            string channelMessage = "i need access to your bungie account to do this. please check your DMs for instructions";
-            string registrationLink = GetNewOAuthLinkForUser(context.User);
-            string userMessage = $"use this link to authorize access to your bungie account:\n{registrationLink}\n";
-            userMessage += "Destiny Emissary will not have access to your email, password, or any other personal information.";
-            await context.Channel.SendMessageAsync(channelMessage);
-            await Discord.UserExtensions.SendMessageAsync(context.User, userMessage);
-        }
-
-        private string GetNewOAuthLinkForUser(IUser user)
-        {
-            return $"https://www.bungie.net/en/oauth/authorize?client_id={config["Bungie:ClientId"]}&response_type=code&state={user.Id}";
-        }
 
     }
 }
