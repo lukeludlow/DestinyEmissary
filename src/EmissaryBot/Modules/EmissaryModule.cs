@@ -13,20 +13,25 @@ namespace EmissaryBot
         }
 
         [Command("current")]
+        [Summary("get your currently equipped items. if your equipped gear matches one of your saved loadouts, then this will tell you what loadout you are currently using.")]
         public async Task<RuntimeResult> CurrentlyEquipped() =>
                 await emissaryService.CurrentlyEquipped(Context.User.Id);
 
         [Command("list")]
+        [Summary("view all of your saved loadouts")]
         public async Task<RuntimeResult> ListLoadouts() =>
                 await emissaryService.ListLoadouts(Context.User.Id);
 
         [Command("equip")]
+        [Summary("equip one of your loadouts")]
         public async Task<RuntimeResult> EquipLoadout(string loadoutName) =>
                 await emissaryService.EquipLoadout(Context.User.Id, loadoutName);
 
-        [Command("save")]
+        [Command("saveas")]
+        [Summary("save your currently equipped gear as a loadout")]
         public async Task<RuntimeResult> SaveLoadout(string loadoutName) =>
                 await emissaryService.SaveCurrentlyEquippedAsLoadout(Context.User.Id, loadoutName);
+
 
     }
 }
