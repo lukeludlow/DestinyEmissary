@@ -33,6 +33,11 @@ namespace EmissaryBot
                     }
                     break;
                 default:
+                    if (commandInfo.IsSpecified && !result.IsSuccess) {
+                        await context.Channel.SendMessageAsync($"incorrect usage: {result.ErrorReason}. use `$help` to see all available commands with example usages");
+                    } else {
+                        await context.Channel.SendMessageAsync("i didn't understand that. use `$help` to see all available commands");
+                    }
                     break;
             }
         }
