@@ -131,10 +131,12 @@ namespace EmissaryCore
             try {
                 equipResponse = bungieApiService.EquipItems(equipRequest);
             } catch (BungieApiException e) {
-                if (e.Message.Contains("Unauthorized")) {
+                string errorMessage = e.Message;
+                if (errorMessage.Contains("Unauthorized")) {
                     RequestAuthorizationEvent?.Invoke(discordId);
+                    errorMessage += " please check your DMs for instructions";
                 }
-                return EmissaryResult.FromError(e.Message);
+                return EmissaryResult.FromError(errorMessage);
             }
 
             // TODO equip exotics last.
