@@ -14,7 +14,7 @@ namespace EmissaryCore
         EmissaryResult EquipLoadout(ulong discordId, string loadoutName);
         EmissaryResult SaveCurrentlyEquippedAsLoadout(ulong discordId, string loadoutName);
         EmissaryResult SaveLoadout(ulong discordId, Loadout loadout, string loadoutName);
-        string DeleteLoadout(ulong discordId, string loadoutName);
+        EmissaryResult DeleteLoadout(ulong discordId, string loadoutName);
         EmissaryResult RegisterOrReauthorize(ulong discordId, string authCode);
         event Action<ulong> RequestAuthorizationEvent;
     }

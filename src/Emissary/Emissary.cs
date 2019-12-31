@@ -149,7 +149,7 @@ namespace EmissaryCore
             }
         }
 
-        public string DeleteLoadout(ulong discordId, string loadoutName)
+        public EmissaryResult DeleteLoadout(ulong discordId, string loadoutName)
         {
             throw new NotImplementedException();
         }

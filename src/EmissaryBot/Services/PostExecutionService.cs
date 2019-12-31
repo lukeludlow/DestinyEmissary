@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -33,10 +34,8 @@ namespace EmissaryBot
                     }
                     break;
                 default:
-                    if (commandInfo.IsSpecified && !result.IsSuccess) {
-                        await context.Channel.SendMessageAsync($"incorrect usage: {result.ErrorReason}. use `$help` to see all available commands with example usages");
-                    } else {
-                        await context.Channel.SendMessageAsync("i didn't understand that. use `$help` to see all available commands");
+                    if (commandInfo.Value.Name != "help") {
+                        await context.Channel.SendMessageAsync("i didn't understand that. use `$help` to see all available commands and example usage");
                     }
                     break;
             }

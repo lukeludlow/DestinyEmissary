@@ -48,10 +48,16 @@ namespace EmissaryBot
             return Task.Run(() => (RuntimeResult)emissary.SaveCurrentlyEquippedAsLoadout(discordId, loadoutName));
         }
 
+        public Task<RuntimeResult> DeleteLoadout(ulong discordId, string loadoutName)
+        {
+            return Task.Run(() => (RuntimeResult)emissary.DeleteLoadout(discordId, loadoutName));
+        }
+
         public Task<RuntimeResult> RegisterOrReauthorize(string discordId, string authCode)
         {
             return Task.Run(() => (RuntimeResult)emissary.RegisterOrReauthorize(ulong.Parse(discordId), authCode));
         }
+
 
         public async void RequestAuthorizationCallback(ulong discordId)
         {
