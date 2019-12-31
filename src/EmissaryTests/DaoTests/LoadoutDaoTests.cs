@@ -8,7 +8,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace EmissaryTests
+namespace EmissaryTests.Dao
 {
     [TestClass]
     public class LoadoutDaoTests

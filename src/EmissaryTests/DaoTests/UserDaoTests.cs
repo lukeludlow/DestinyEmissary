@@ -7,7 +7,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace EmissaryTests
+namespace EmissaryTests.Dao
 {
     [TestClass]
     public class UserDaoTests

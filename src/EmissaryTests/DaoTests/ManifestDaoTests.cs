@@ -9,7 +9,7 @@ using Microsoft.Data.Sqlite;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace EmissaryTests
+namespace EmissaryTests.Dao
 {
     [TestClass]
     public class ManifestDaoTests

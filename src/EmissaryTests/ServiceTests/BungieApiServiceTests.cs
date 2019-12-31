@@ -10,7 +10,7 @@ using System.Net;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace EmissaryTests
+namespace EmissaryTests.Service
 {
     [TestClass]
     public class BungieApiServiceTests

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace EmissaryCore
 {
-    public class DestinyItem
+    public class DestinyItem : IEquatable<DestinyItem>
     {
         [Key]
         public long ItemInstanceId { get; set; }
@@ -30,6 +32,26 @@ namespace EmissaryCore
             this.Name = "";
             this.Categories = new List<string>();
             this.CategoryHashes = new List<uint>();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as DestinyItem);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ItemInstanceId, Name, Categories, ItemHash, CategoryHashes);
+        }
+
+        public bool Equals(DestinyItem other)
+        {
+            return other is DestinyItem &&
+                   this.ItemInstanceId == other.ItemInstanceId &&
+                   this.Name == other.Name &&
+                   this.Categories.All(other.Categories.Contains) &&
+                   this.ItemHash == other.ItemHash &&
+                   this.CategoryHashes.All(other.CategoryHashes.Contains);
         }
     }
 }

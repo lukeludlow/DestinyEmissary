@@ -25,11 +25,11 @@ namespace EmissaryCore
         public event Action<ulong> RequestAuthorizationEvent;
 
 
-        public Emissary(IConfiguration config, IBungieApiService bungieApiService, IManifestDao manifestAccessor, EmissaryDbContext dbContext, IUserDao userDao, ILoadoutDao loadoutDao)
+        public Emissary(IConfiguration config, IBungieApiService bungieApiService, IManifestDao manifestDao, EmissaryDbContext dbContext, IUserDao userDao, ILoadoutDao loadoutDao)
         {
             this.config = config;
             this.bungieApiService = bungieApiService;
-            this.manifestDao = manifestAccessor;
+            this.manifestDao = manifestDao;
             this.dbContext = dbContext;
             this.userDao = userDao;
             this.loadoutDao = loadoutDao;
@@ -64,13 +64,26 @@ namespace EmissaryCore
             Loadout currentlyEquipped = new Loadout();
             currentlyEquipped.DiscordId = user.DiscordId;
             currentlyEquipped.DestinyCharacterId = destinyCharacterId;
-            currentlyEquipped.LoadoutName = "currently equipped";
+            currentlyEquipped.LoadoutName = "unsaved loadout";
             currentlyEquipped.Items = equipmentResponse.Items
                     .Select(genericItem => CreateDestinyItemFromGenericItem(genericItem))
                     .Where(item => ItemIsWeaponOrArmor(item))
                     .ToList();
+            IList<Loadout> savedLoadouts = loadoutDao.GetAllLoadoutsForUser(discordId);
+            if (savedLoadouts != null && savedLoadouts.Count > 0) {
+                foreach (Loadout savedLoadout in savedLoadouts) {
+                    bool loadoutsAreEqual = currentlyEquipped.DestinyCharacterId == savedLoadout.DestinyCharacterId
+                            && currentlyEquipped.Items.Count == savedLoadout.Items.Count
+                            && currentlyEquipped.Items.All(savedLoadout.Items.Contains);
+                    if (loadoutsAreEqual) {
+                        currentlyEquipped.LoadoutName = savedLoadout.LoadoutName;
+                        break;
+                    }
+                }
+            }
             return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(currentlyEquipped));
         }
+
 
         private bool ItemIsWeaponOrArmor(DestinyItem item)
         {
