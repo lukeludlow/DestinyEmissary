@@ -128,6 +128,11 @@ namespace EmissaryTests.Core
         // TODO this should refresh the token and try again
         // EquipLoadout_AccessTokenExpiredButCanBeRefreshed_ShouldSendRequestToBungieApiToReauthorizeThenProceedToEquipLoadout
 
+        [TestMethod]
+        public void EquipLoadout_FirstAttemptFailsBecauseOfExoticItems_ShouldTryAgain()
+        {
+            Assert.Fail();
+        }
 
 
 

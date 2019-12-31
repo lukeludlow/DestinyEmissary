@@ -28,7 +28,7 @@ namespace EmissaryCore
                     eb.WithDescription(sb.ToString());
                     break;
                 case "current":
-                    eb.WithTitle($"{context.User.Username}'s currently equipped items");
+                    eb.WithTitle($"{context.User.Username}'s currently equipped loadout");
                     eb.WithDescription(LoadoutToDescription(JsonConvert.DeserializeObject<Loadout>(result.Message)));
                     break;
                 case "save":

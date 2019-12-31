@@ -131,6 +131,9 @@ namespace EmissaryCore
             try {
                 equipResponse = bungieApiService.EquipItems(equipRequest);
             } catch (BungieApiException e) {
+                if (e.Message.Contains("Unauthorized")) {
+                    RequestAuthorizationEvent?.Invoke(discordId);
+                }
                 return EmissaryResult.FromError(e.Message);
             }
             EmissaryResult result;
