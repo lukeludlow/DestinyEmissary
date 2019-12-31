@@ -136,13 +136,40 @@ namespace EmissaryCore
                 }
                 return EmissaryResult.FromError(e.Message);
             }
+
+            // TODO equip exotics last.
+            // otherwise we might get the DestinyItemUniqueEquipRestricted error, which is annoying 
+            // because i have to tell the user to try again or do a thread.sleep(0.1sec) which is a big waste.
+            // instead, adjust the order of the equip request so that exotics are very last. that way the 
+            // purple legendaries are equipped first (replacing any exotics in that slot) 
+            // and we won't have an exotic equip limit error.
+
             EmissaryResult result;
             if (equipResponse.EquipResults.All(equipResult => equipResult.EquipStatus == BungiePlatformErrorCodes.Success)) {
                 result = EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } else {
-                result = EmissaryResult.FromError("some items could not be equipped. TODO use error codes to further explain");
+                string errorMessage = "some items could not be equipped.";
+                foreach (EquipItemResult equipResult in equipResponse.EquipResults) {
+                    if (equipResult.EquipStatus != BungiePlatformErrorCodes.Success) {
+                        errorMessage += $"\n{GetErrorDescriptionHelpMessageForEquipFail(equipResult.EquipStatus)}";
+                    }
+                }
+                result = EmissaryResult.FromError(errorMessage);
             }
             return result;
+        }
+
+        private string GetErrorDescriptionHelpMessageForEquipFail(int equipStatusErrorCode)
+        {
+            string message = "";
+            if (equipStatusErrorCode == BungiePlatformErrorCodes.DestinyItemNotFound) {
+                message += "one or more items were not found. this is probably because you've dismantled a weapon or piece of armor that was part of this loadout. to fix this, please overwrite or delete this loadout.";
+            } else if (equipStatusErrorCode == BungiePlatformErrorCodes.DestinyItemUniqueEquipRestricted) {
+                message += "tried to equip more than one exotic at a time. if this error happens, it's because my creator is stupid. to fix this, please send the equip command again and it should work.";
+            } else {
+                message += $"bungie platform error code: {equipStatusErrorCode}\nplease try again.";
+            }
+            return message;
         }
 
         // TODO finalize and test this

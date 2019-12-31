@@ -9,5 +9,6 @@ namespace EmissaryCore
         public static readonly int Success = 1;
         public static readonly int DestinyAccountNotFound = 1601;
         public static readonly int DestinyItemNotFound = 1623;
+        public static readonly int DestinyItemUniqueEquipRestricted = 1641;
     }
 }
