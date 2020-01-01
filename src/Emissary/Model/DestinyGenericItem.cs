@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 
 namespace EmissaryCore
 {
+    [JsonConverter(typeof(JsonPathConverter))]
     public class DestinyGenericItem
     {
         [JsonProperty("itemHash")]

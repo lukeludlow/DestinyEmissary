@@ -23,7 +23,7 @@ namespace EmissaryTests.Dao
             uint izanagiHash = 3211806999;
             long izanagiInstanceId = 6917529135183883487;
             string loadoutName = "crucible";
-            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
 
             // string testDbPath = "/Users/luke/code/DestinyEmissary/src/data/emissary-test.db";
@@ -56,7 +56,7 @@ namespace EmissaryTests.Dao
             uint izanagiHash = 3211806999;
             long izanagiInstanceId = 6917529135183883487;
             string loadoutName = "crucible";
-            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
@@ -94,7 +94,7 @@ namespace EmissaryTests.Dao
             uint izanagiHash = 3211806999;
             long izanagiInstanceId = 6917529135183883487;
             string loadoutName = "crucible";
-            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 });
+            DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout loadout = new Loadout(discordId, destinyCharacterId, loadoutName, new List<DestinyItem>() { izanagiItem });
             Loadout loadout2 = new Loadout(discordId, 69, loadoutName, new List<DestinyItem>() { });
 
@@ -156,7 +156,7 @@ namespace EmissaryTests.Dao
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
 
@@ -189,7 +189,7 @@ namespace EmissaryTests.Dao
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
 
@@ -197,7 +197,7 @@ namespace EmissaryTests.Dao
             long suddenDeathInstanceId = 6917529043814140192;
             DestinyItem suddenDeathItem = new DestinyItem(suddenDeathInstanceId, "A Sudden Death",
                     new List<string>() { "Energy Weapon", "Weapon", "Shotgun" }, suddenDeathHash,
-                    new List<uint>() { 3, 1, 11 });
+                    new List<uint>() { 3, 1, 11 }, "Exotic");
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -261,12 +261,12 @@ namespace EmissaryTests.Dao
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Kinetic Weapon", "Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             uint suddenDeathHash = 1879212552;
             long suddenDeathInstanceId = 6917529043814140192;
             DestinyItem suddenDeathItem = new DestinyItem(suddenDeathInstanceId, "A Sudden Death",
                     new List<string>() { "Energy Weapon", "Weapon", "Shotgun" }, suddenDeathHash,
-                    new List<uint>() { 3, 1, 11 });
+                    new List<uint>() { 3, 1, 11 }, "Legendary");
 
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
@@ -330,7 +330,7 @@ namespace EmissaryTests.Dao
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
 

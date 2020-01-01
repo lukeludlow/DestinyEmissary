@@ -28,12 +28,13 @@ namespace EmissaryTests.Dao
                         It.IsRegex(@".*\.manifest$")))
                 .Returns(jsonResponse);
 
-            ManifestItemDefinition expected = new ManifestItemDefinition("Izanagi's Burden",
+            ManifestItemDefinition expected = new ManifestItemDefinition("Izanagi's Burden", "Exotic",
                     new List<uint>() { 2, 1, 10 });
 
             ManifestDao manifestDao = new ManifestDao(config, databaseAccessor);
             ManifestItemDefinition actual = manifestDao.GetItemDefinition(izanagiHash);
             Assert.AreEqual(expected.DisplayName, actual.DisplayName);
+            Assert.AreEqual(expected.TierTypeName, actual.TierTypeName);
             Assert.IsTrue(expected.ItemCategoryHashes.SequenceEqual(actual.ItemCategoryHashes));
         }
 

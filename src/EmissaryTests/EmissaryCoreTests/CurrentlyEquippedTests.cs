@@ -56,7 +56,7 @@ namespace EmissaryTests.Core
 
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Kinetic Weapon", "Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             IList<DestinyItem> expectedLoadoutItems = new List<DestinyItem>() { izanagiItem };
             Loadout expectedLoadout = new Loadout(discordId, titan.CharacterId, "unsaved loadout", expectedLoadoutItems);
 
@@ -65,7 +65,7 @@ namespace EmissaryTests.Core
             // x.GetCharacterEquipment(equipmentRequest) == equipmentResponse
             // );
 
-            ManifestItemDefinition izanagiItemDefinition = new ManifestItemDefinition("Izanagi's Burden", new uint[] { 2, 1, 10 });
+            ManifestItemDefinition izanagiItemDefinition = new ManifestItemDefinition("Izanagi's Burden", "Exotic", new uint[] { 2, 1, 10 });
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(izanagiHash)).Returns(izanagiItemDefinition);
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(1)).Returns(new ManifestItemCategoryDefinition("Weapon"));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
@@ -191,23 +191,23 @@ namespace EmissaryTests.Core
             // x.GetCharacterEquipment(equipmentRequest) == equipmentResponse
             // );
 
-            ManifestItemDefinition perfectParadoxItemDefinition = new ManifestItemDefinition("Perfect Paradox", new List<uint>() { 1, 2 });
-            ManifestItemDefinition suddenDeathItemDefinition = new ManifestItemDefinition("A Sudden Death", new List<uint>() { 1, 3 });
-            ManifestItemDefinition apexPredatorItemDefinition = new ManifestItemDefinition("Apex Predator", new List<uint>() { 1, 4 });
-            ManifestItemDefinition maskOfRullItemDefinition = new ManifestItemDefinition("Mask of Rull", new List<uint>() { 20 });
-            ManifestItemDefinition reverieDawnGauntletsItemDefinition = new ManifestItemDefinition("Reverie Dawn Gauntlets", new List<uint>() { 20 });
-            ManifestItemDefinition plateOfTranscendenceItemDefinition = new ManifestItemDefinition("Plate of Transcendence", new List<uint>() { 20 });
-            ManifestItemDefinition peacekeepersItemDefinition = new ManifestItemDefinition("Peacekeepers", new List<uint>() { 20 });
-            ManifestItemDefinition markOfTheGreatHuntItemDefinition = new ManifestItemDefinition("Mark of the Great Hunt", new List<uint>() { 20 });
-            ManifestItemDefinition starMapShellItemDefinition = new ManifestItemDefinition("Star Map Shell", new List<uint>());
-            ManifestItemDefinition soloStandSparrowItemDefinition = new ManifestItemDefinition("Solo Stand", new List<uint>());
-            ManifestItemDefinition safePassageItemDefinition = new ManifestItemDefinition("Safe Passage", new List<uint>());
-            ManifestItemDefinition sentinelItemDefinition = new ManifestItemDefinition("Sentinel", new List<uint>());
-            ManifestItemDefinition clanBannerItemDefinition = new ManifestItemDefinition("Clan Banner", new List<uint>());
-            ManifestItemDefinition prismaticInfernoItemDefinition = new ManifestItemDefinition("Prismatic Inferno", new List<uint>());
-            ManifestItemDefinition finishersItemDefinition = new ManifestItemDefinition("Finishers", new List<uint>());
-            ManifestItemDefinition emotesItemDefinition = new ManifestItemDefinition("Emotes", new List<uint>());
-            ManifestItemDefinition lanternOfOsirisItemDefinition = new ManifestItemDefinition("The Lantern of Osiris", new List<uint>());
+            ManifestItemDefinition perfectParadoxItemDefinition = new ManifestItemDefinition("Perfect Paradox", "Legendary", new List<uint>() { 1, 2 });
+            ManifestItemDefinition suddenDeathItemDefinition = new ManifestItemDefinition("A Sudden Death", "Legendary", new List<uint>() { 1, 3 });
+            ManifestItemDefinition apexPredatorItemDefinition = new ManifestItemDefinition("Apex Predator", "Legendary", new List<uint>() { 1, 4 });
+            ManifestItemDefinition maskOfRullItemDefinition = new ManifestItemDefinition("Mask of Rull", "Legendary", new List<uint>() { 20 });
+            ManifestItemDefinition reverieDawnGauntletsItemDefinition = new ManifestItemDefinition("Reverie Dawn Gauntlets", "Legendary", new List<uint>() { 20 });
+            ManifestItemDefinition plateOfTranscendenceItemDefinition = new ManifestItemDefinition("Plate of Transcendence", "Legendary", new List<uint>() { 20 });
+            ManifestItemDefinition peacekeepersItemDefinition = new ManifestItemDefinition("Peacekeepers", "Exotic", new List<uint>() { 20 });
+            ManifestItemDefinition markOfTheGreatHuntItemDefinition = new ManifestItemDefinition("Mark of the Great Hunt", "Legendary", new List<uint>() { 20 });
+            ManifestItemDefinition starMapShellItemDefinition = new ManifestItemDefinition("Star Map Shell", "Exotic", new List<uint>());
+            ManifestItemDefinition soloStandSparrowItemDefinition = new ManifestItemDefinition("Solo Stand", "Legendary", new List<uint>());
+            ManifestItemDefinition safePassageItemDefinition = new ManifestItemDefinition("Safe Passage", "Legendary", new List<uint>());
+            ManifestItemDefinition sentinelItemDefinition = new ManifestItemDefinition("Sentinel", "Common", new List<uint>());
+            ManifestItemDefinition clanBannerItemDefinition = new ManifestItemDefinition("Clan Banner", "Legendary", new List<uint>());
+            ManifestItemDefinition prismaticInfernoItemDefinition = new ManifestItemDefinition("Prismatic Inferno", "Legendary", new List<uint>());
+            ManifestItemDefinition finishersItemDefinition = new ManifestItemDefinition("Finishers", "Common", new List<uint>());
+            ManifestItemDefinition emotesItemDefinition = new ManifestItemDefinition("Emotes", "Common", new List<uint>());
+            ManifestItemDefinition lanternOfOsirisItemDefinition = new ManifestItemDefinition("The Lantern of Osiris", "Legendary", new List<uint>());
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(perfectParadoxHash)).Returns(perfectParadoxItemDefinition);
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(suddenDeathHash)).Returns(suddenDeathItemDefinition);
             Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(apexPredatorHash)).Returns(apexPredatorItemDefinition);
@@ -260,8 +260,8 @@ namespace EmissaryTests.Core
             ulong discordId = 69;
             long destinyCharacterId = 420;
             string loadoutName = "last wish raid";
-            DestinyItem destinyItem1 = new DestinyItem(6969, "dummy item 1", new List<string>() { "Weapon", "Kinetic Weapon" }, 420420, new List<uint>() { 1, 2 });
-            DestinyItem destinyItem2 = new DestinyItem(9696, "dummy item 2", new List<string>() { "Armor", "Helmet" }, 240240, new List<uint>() { 3, 4 });
+            DestinyItem destinyItem1 = new DestinyItem(6969, "dummy item 1", new List<string>() { "Weapon", "Kinetic Weapon" }, 420420, new List<uint>() { 1, 2 }, "Legendary");
+            DestinyItem destinyItem2 = new DestinyItem(9696, "dummy item 2", new List<string>() { "Armor", "Helmet" }, 240240, new List<uint>() { 3, 4 }, "Legendary");
             List<DestinyItem> loadoutItems = new List<DestinyItem>() { destinyItem1, destinyItem2 };
             Loadout savedLoadout = new Loadout(discordId, destinyCharacterId, loadoutName, loadoutItems);
 
@@ -284,8 +284,8 @@ namespace EmissaryTests.Core
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
             Mock.Get(bungieApiService).Setup(m => m.GetCharacterEquipment(It.IsAny<CharacterEquipmentRequest>())).Returns(equipmentResponse);
 
-            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem1.ItemHash)).Returns(new ManifestItemDefinition(destinyItem1.Name, destinyItem1.CategoryHashes));
-            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem2.ItemHash)).Returns(new ManifestItemDefinition(destinyItem2.Name, destinyItem2.CategoryHashes));
+            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem1.ItemHash)).Returns(new ManifestItemDefinition(destinyItem1.Name, destinyItem1.TierTypeName, destinyItem1.CategoryHashes));
+            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem2.ItemHash)).Returns(new ManifestItemDefinition(destinyItem2.Name, destinyItem2.TierTypeName, destinyItem2.CategoryHashes));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(1)).Returns(new ManifestItemCategoryDefinition("Weapon"));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(3)).Returns(new ManifestItemCategoryDefinition("Armor"));
@@ -313,8 +313,8 @@ namespace EmissaryTests.Core
             ulong discordId = 69;
             long destinyCharacterId = 420;
             string loadoutName = "last wish raid";
-            DestinyItem destinyItem1 = new DestinyItem(6969, "dummy item 1", new List<string>() { "Weapon", "Kinetic Weapon" }, 420420, new List<uint>() { 1, 2 });
-            DestinyItem destinyItem2 = new DestinyItem(9696, "dummy item 2", new List<string>() { "Armor", "Helmet" }, 240240, new List<uint>() { 3, 4 });
+            DestinyItem destinyItem1 = new DestinyItem(6969, "dummy item 1", new List<string>() { "Weapon", "Kinetic Weapon" }, 420420, new List<uint>() { 1, 2 }, "Legendary");
+            DestinyItem destinyItem2 = new DestinyItem(9696, "dummy item 2", new List<string>() { "Armor", "Helmet" }, 240240, new List<uint>() { 3, 4 }, "Legendary");
             List<DestinyItem> loadoutItems = new List<DestinyItem>() { destinyItem1, destinyItem2 };
             Loadout savedLoadout = new Loadout(discordId, destinyCharacterId, loadoutName, loadoutItems);
 
@@ -336,7 +336,7 @@ namespace EmissaryTests.Core
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
             Mock.Get(bungieApiService).Setup(m => m.GetCharacterEquipment(It.IsAny<CharacterEquipmentRequest>())).Returns(equipmentResponse);
 
-            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem1.ItemHash)).Returns(new ManifestItemDefinition(destinyItem1.Name, destinyItem1.CategoryHashes));
+            Mock.Get(manifestDao).Setup(m => m.GetItemDefinition(destinyItem1.ItemHash)).Returns(new ManifestItemDefinition(destinyItem1.Name, destinyItem1.TierTypeName, destinyItem1.CategoryHashes));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(1)).Returns(new ManifestItemCategoryDefinition("Weapon"));
             Mock.Get(manifestDao).Setup(m => m.GetItemCategoryDefinition(2)).Returns(new ManifestItemCategoryDefinition("Kinetic Weapon"));
 

@@ -97,6 +97,7 @@ namespace EmissaryCore
             item.ItemInstanceId = genericItem.ItemInstanceId;
             ManifestItemDefinition manifestItemDefinition = manifestDao.GetItemDefinition(genericItem.ItemHash);
             item.Name = manifestItemDefinition.DisplayName;
+            item.TierTypeName = manifestItemDefinition.TierTypeName;
             item.CategoryHashes = manifestItemDefinition.ItemCategoryHashes;
             item.Categories = item.CategoryHashes
                     .Select(hash => manifestDao.GetItemCategoryDefinition(hash).CategoryName)
@@ -124,9 +125,20 @@ namespace EmissaryCore
                 return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
+            loadoutName = loadoutName.Trim();
             Loadout loadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
-            IList<long> itemInstanceIds = loadout.Items.Select(item => item.ItemInstanceId).ToList();
+
+            IList<DestinyItem> itemsToEquip = loadout.Items;
+            foreach (DestinyItem item in itemsToEquip.ToList()) {
+                if (item.TierTypeName == "Exotic") {
+                    itemsToEquip.RemoveAt(itemsToEquip.IndexOf(item));
+                    itemsToEquip.Add(item);
+                }
+            }
+            IList<long> itemInstanceIds = itemsToEquip.Select(item => item.ItemInstanceId).ToList();
+
             EquipItemsRequest equipRequest = new EquipItemsRequest(user.BungieAccessToken, user.DestinyMembershipType, destinyCharacterId, itemInstanceIds);
+
             EquipItemsResponse equipResponse;
             try {
                 equipResponse = bungieApiService.EquipItems(equipRequest);

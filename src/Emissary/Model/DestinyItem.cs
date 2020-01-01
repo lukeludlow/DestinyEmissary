@@ -17,14 +17,16 @@ namespace EmissaryCore
         // the manifest so that i can build the destiny item object with the string values
         public uint ItemHash { get; set; }
         public IList<uint> CategoryHashes { get; set; }
+        public string TierTypeName { get; set; }  // e.g. Exotic, Legendary
 
-        public DestinyItem(long itemInstanceId, string name, IList<string> categories, uint itemHash, IList<uint> categoryHashes)
+        public DestinyItem(long itemInstanceId, string name, IList<string> categories, uint itemHash, IList<uint> categoryHashes, string tierTypeName)
         {
             this.ItemInstanceId = itemInstanceId;
             this.Name = name;
             this.Categories = categories;
             this.ItemHash = itemHash;
             this.CategoryHashes = categoryHashes;
+            this.TierTypeName = tierTypeName;
         }
 
         public DestinyItem()
@@ -41,7 +43,7 @@ namespace EmissaryCore
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ItemInstanceId, Name, Categories, ItemHash, CategoryHashes);
+            return HashCode.Combine(ItemInstanceId, Name, Categories, ItemHash, CategoryHashes, TierTypeName);
         }
 
         public bool Equals(DestinyItem other)
@@ -51,7 +53,8 @@ namespace EmissaryCore
                    this.Name == other.Name &&
                    this.Categories.All(other.Categories.Contains) &&
                    this.ItemHash == other.ItemHash &&
-                   this.CategoryHashes.All(other.CategoryHashes.Contains);
+                   this.CategoryHashes.All(other.CategoryHashes.Contains) &&
+                   this.TierTypeName == other.TierTypeName;
         }
     }
 }

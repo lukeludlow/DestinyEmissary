@@ -39,7 +39,7 @@ namespace EmissaryTests.Core
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
 
@@ -80,12 +80,12 @@ namespace EmissaryTests.Core
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden",
                     new List<string>() { "Kinetic Weapon", "Weapon", "Sniper Rifle" }, izanagiHash,
-                    new List<uint>() { 2, 1, 10 });
+                    new List<uint>() { 2, 1, 10 }, "Exotic");
             uint suddenDeathHash = 1879212552;
             long suddenDeathInstanceId = 6917529043814140192;
             DestinyItem suddenDeathItem = new DestinyItem(suddenDeathInstanceId, "A Sudden Death",
                     new List<string>() { "Energy Weapon", "Weapon", "Shotgun" }, suddenDeathHash,
-                    new List<uint>() { 3, 1, 11 });
+                    new List<uint>() { 3, 1, 11 }, "Exotic");
 
             Loadout titanLoadout = new Loadout(discordId, titanCharacterId, "raid",
                     new List<DestinyItem>() { izanagiItem });
