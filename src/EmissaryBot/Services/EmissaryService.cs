@@ -69,7 +69,7 @@ namespace EmissaryBot
         {
             string registrationLink = GetNewOAuthLinkForUser(user);
             string userMessage = $"use this link to authorize access to your bungie account:\n{registrationLink}\n";
-            userMessage += "Destiny Emissary won't have access to your email, password, or any other personal information.";
+            userMessage += "Destiny Emissary **won't** have access to your email, password, or any other personal information.";
             await Discord.UserExtensions.SendMessageAsync(user, userMessage);
         }
 
