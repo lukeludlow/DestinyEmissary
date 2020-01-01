@@ -28,7 +28,7 @@ namespace EmissaryBot
                 await emissaryService.EquipLoadout(Context.User.Id, loadoutName);
 
         [Command("saveas")]
-        [Summary("save your currently equipped weapons and armor as a loadout. (note: everything you write after \"saveas\" will be the loadout name.)\nexample usage: `$saveas last wish raid`")]
+        [Summary("save your currently equipped weapons and armor as a loadout. everything you write after \"saveas\" will be the loadout name. if you already have a loadout with the same name, then this will overwrite it.\nexample usage: `$saveas last wish raid`")]
         public async Task<RuntimeResult> SaveLoadout([Remainder] string loadoutName) =>
                 await emissaryService.SaveCurrentlyEquippedAsLoadout(Context.User.Id, loadoutName);
 

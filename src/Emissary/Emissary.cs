@@ -200,6 +200,10 @@ namespace EmissaryCore
             loadout.DiscordId = discordId;
             loadout.LoadoutName = loadoutName;
             try {
+                int maxLoadoutLimit = 25;
+                if (loadoutDao.GetAllLoadoutsForUser(discordId).Count >= maxLoadoutLimit) {
+                    return EmissaryResult.FromError($"you've reached the max loadout limit ({maxLoadoutLimit}). please delete or overwrite an existing loadouts in order to save this loadout");
+                }
                 loadoutDao.AddOrUpdateLoadout(loadout);
                 return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } catch (Exception e) {

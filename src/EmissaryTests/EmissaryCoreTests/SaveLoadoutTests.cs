@@ -33,12 +33,14 @@ namespace EmissaryTests.Core
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, "");
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
 
             uint izanagiHash = 3211806999;
             long izanagiInstanceId = 6917529135183883487;
             DestinyItem izanagiItem = new DestinyItem(izanagiInstanceId, "Izanagi's Burden", new List<string>() { "Weapon", "Kinetic Weapon", "Sniper Rifle" }, izanagiHash, new List<uint>() { 2, 1, 10 }, "Exotic");
             Loadout loadoutToSave = new Loadout(discordId, destinyCharacterId, "crucible", new List<DestinyItem>() { izanagiItem });
+
+            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(new List<Loadout>());
 
             IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
             EmissaryResult result = emissary.SaveLoadout(discordId, loadoutToSave, "crucible");
@@ -125,6 +127,7 @@ namespace EmissaryTests.Core
                     // ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
                     ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
                     // EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+                    // Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(69)).Returns(new List<Loadout>());
                     Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
                     // connection.Close();
                     // dbContext.Database.CloseConnection();
@@ -142,6 +145,34 @@ namespace EmissaryTests.Core
         //     Assert.Fail();
         // }
 
+        [TestMethod]
+        public void SaveLoadout_AlreadyReachedMaxLoadoutLimit_ShouldReturnError()
+        {
+            int maxLoadoutsLimit = 25;
+
+            IConfiguration config = Mock.Of<IConfiguration>();
+            IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
+            IManifestDao manifestDao = Mock.Of<IManifestDao>();
+            IUserDao userDao = Mock.Of<IUserDao>();
+            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
+            EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+
+            ulong discordId = 69;
+            long characterId = 420;
+            Loadout loadoutToSave = new Loadout(discordId, characterId, "loadout 26", new List<DestinyItem>());
+
+            IList<Loadout> savedLoadouts = new List<Loadout>(new Loadout[maxLoadoutsLimit]);
+            for (int i = 0; i < maxLoadoutsLimit; i++) {
+                savedLoadouts[i] = new Loadout(discordId, characterId, $"loadout {i + 1}", new List<DestinyItem>());
+            }
+            Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(savedLoadouts);
+
+            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            EmissaryResult result = emissary.SaveLoadout(discordId, loadoutToSave, "loadout 26");
+
+            Assert.IsFalse(result.Success);
+            Assert.IsTrue(result.ErrorMessage.Contains("limit"));
+        }
 
 
     }
