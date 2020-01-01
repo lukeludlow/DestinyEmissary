@@ -23,7 +23,7 @@ namespace EmissaryBot
                 await emissaryService.ListLoadouts(Context.User.Id);
 
         [Command("equip")]
-        [Summary("equip one of your loadouts. the loadout name must match the saved name exactly, including spaces and capitalization.\nexample usage: `$equip crucible`")]
+        [Summary("equip one of your loadouts.\nexample usage: `$equip crucible`")]
         public async Task<RuntimeResult> EquipLoadout([Remainder] string loadoutName) =>
                 await emissaryService.EquipLoadout(Context.User.Id, loadoutName);
 
@@ -33,7 +33,7 @@ namespace EmissaryBot
                 await emissaryService.SaveCurrentlyEquippedAsLoadout(Context.User.Id, loadoutName);
 
         [Command("delete")]
-        [Summary("delete one of your saved loadouts. the loadout name must match the saved name exactly, including spaces and capitalization. (note: this can't alter any of your in-game items, it just makes destiny emissary forget the loadout.)\nexample usage: `$delete last wish raid`")]
+        [Summary("delete one of your saved loadouts. (note: this can't alter any of your in-game items, it just makes destiny emissary forget the loadout.)\nexample usage: `$delete last wish raid`")]
         public async Task<RuntimeResult> DeleteLoadout([Remainder] string loadoutName) =>
                 await emissaryService.DeleteLoadout(Context.User.Id, loadoutName);
 

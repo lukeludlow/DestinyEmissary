@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace EmissaryCore
 {
@@ -208,7 +209,19 @@ namespace EmissaryCore
 
         public EmissaryResult DeleteLoadout(ulong discordId, string loadoutName)
         {
-            throw new NotImplementedException();
+            EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            if (user == null) {
+                RequestAuthorizationEvent?.Invoke(discordId);
+                return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
+            }
+            long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
+            loadoutName = loadoutName.Trim();
+            Loadout foundLoadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
+            if (foundLoadout == null) {
+                return EmissaryResult.FromError($"loadout not found. use `$list` to view all of your saved loadouts");
+            }
+            loadoutDao.RemoveLoadout(discordId, destinyCharacterId, loadoutName);
+            return EmissaryResult.FromSuccess($"successfully deleted loadout \"{loadoutName}\"");
         }
 
         public EmissaryResult RegisterOrReauthorize(ulong discordId, string authCode)
