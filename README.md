@@ -1,17 +1,58 @@
 
-# destiny emissary (work in progress)
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://github.com/lukeludlow/DestinyEmissary">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
-## dependencies (?)
+  <h3 align="center">destiny dmissary</h3>
 
-BungieNetPlatform (?)
-https://github.com/xlxCLUxlx/BungieNetPlatform
-https://www.nuget.org/packages/BungieNetPlatform/
+  <p align="center">
+		// blah
+    <br />
+    <br />
+    <a href="https://github.com/lukeludlow/DestinyEmissary">view demo</a>
+    ·
+    <a href="https://github.com/lukeludlow/DestinyEmissary/issues">report bug</a>
+    ·
+    <a href="https://github.com/lukeludlow/DestinyEmissary/issues">request feature</a>
+  </p>
+</p>
 
 
-Bungie.Net API 
-https://github.com/Bungie-net/api
-https://bungie-net.github.io/multi/index.html
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+![Product Name Screen Shot][product-screenshot]
+
+// blah
+
+Here's why:
+* a
+
+### built with
+This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+* [Bootstrap](https://getbootstrap.com)
+* [JQuery](https://jquery.com)
 
 
-Discord.Net
-https://github.com/discord-net/Discord.Net
+## getting started
+
+// blah
+
+
+## usage
+
+// blah
+
+
+
+## contributing
+
+// blah
+
+
+## license
+
+// maybe?
