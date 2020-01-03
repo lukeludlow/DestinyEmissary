@@ -76,7 +76,7 @@ namespace EmissaryTests.Service
             refreshResponse.AccessToken = "new.access.token";
             refreshResponse.RefreshToken = "refresh.token";
             refreshResponse.AccessTokenExpiresInSeconds = 3600;
-            refreshResponse.RefreshTokenExpiresInSeconds = 7772399; // (7776000 - 3601). but i'm not sure what this should be
+            refreshResponse.RefreshTokenExpiresInSeconds = 7776000;
             Mock.Get(bungieApiService).Setup(m => m.RefreshAccessToken("refresh.token")).Returns(refreshResponse);
 
             IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
@@ -88,7 +88,7 @@ namespace EmissaryTests.Service
         }
 
         [TestMethod]
-        public void GetAccessToken_TokenHasExpiredAndCantBeRefreshed_ShouldReturnNull()
+        public void GetAccessToken_TokenIsExpiredAndRefreshTokenIsAlsoExpired_ShouldNotCallBungieApiAndShouldReturnNull()
         {
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
@@ -100,22 +100,40 @@ namespace EmissaryTests.Service
             accessToken.AccessToken = "access.token";
             accessToken.RefreshToken = "refresh.token";
             accessToken.AccessTokenExpiresInSeconds = 3600;
-            int oneDayInSeconds = 86400;
-            accessToken.RefreshTokenExpiresInSeconds = oneDayInSeconds;  // i'm not sure what this should be
+            accessToken.RefreshTokenExpiresInSeconds = 7776000;
 
             Mock.Get(emissaryDao).Setup(m => m.GetAccessTokenByDiscordId(discordId)).Returns(accessToken);
 
             DateTimeOffset currentTime = DateTimeOffset.UtcNow;
-            DateTimeOffset timeTwoDaysAgo = currentTime.AddDays(-2);
-            accessToken.RefreshTokenCreatedDate = timeTwoDaysAgo;
-            DateTimeOffset timeSixtyMinsAgo = currentTime.AddSeconds(-3601);
-            accessToken.AccessTokenCreatedDate = timeSixtyMinsAgo;
+            DateTimeOffset timeOverNinetyDaysAgo = currentTime.AddDays(-91);
+            accessToken.RefreshTokenCreatedDate = timeOverNinetyDaysAgo;
+            DateTimeOffset timeOverSixtyMinsAgo = currentTime.AddSeconds(-3601);
+            accessToken.AccessTokenCreatedDate = timeOverSixtyMinsAgo;
 
             IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
-
             string actual = authorizationService.GetAccessToken(discordId);
+
             Assert.IsNull(actual);
-            Mock.Get(bungieApiService).Verify(m => m.RefreshAccessToken(It.IsAny<string>()), Times.Never());
+            Mock.Get(bungieApiService).VerifyNoOtherCalls();
+        }
+
+        [TestMethod]
+        public void GetAccessToken_TriesToRefreshTokenButApiRequestFails_ShouldCallBungieApiAndShouldReturnNull()
+        {
+            IConfiguration config = Mock.Of<IConfiguration>();
+            IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+
+            OAuthResponse errorResponse = new OAuthResponse();
+            errorResponse.ErrorType = "invalid_request";
+            errorResponse.ErrorDescription = "Missing required parameter code";
+            Mock.Get(bungieApiService).Setup(m => m.RefreshAccessToken("refresh-token")).Returns(errorResponse);
+
+            IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
+            string actual = authorizationService.GetAccessToken(69);
+
+            Assert.IsNull(actual);
+            Mock.Get(bungieApiService).VerifyNoOtherCalls();
         }
 
         [TestMethod]
@@ -125,26 +143,55 @@ namespace EmissaryTests.Service
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
 
+            DateTimeOffset currentTimeBeforeRequest = DateTimeOffset.UtcNow;
+
+            OAuthResponse oauthResponse = new OAuthResponse();
+            oauthResponse.AccessToken = "new-access-token";
+            oauthResponse.RefreshToken = "refresh-token";
+            oauthResponse.AccessTokenExpiresInSeconds = 3600;
+            oauthResponse.RefreshTokenExpiresInSeconds = 7776000;
+
+            Mock.Get(bungieApiService).Setup(m => m.GetOAuthAccessToken(It.IsAny<OAuthRequest>())).Returns(oauthResponse);
+
             IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
 
-            Assert.Fail();
+            ulong discordId = 69;
+            OAuthResponse actual = authorizationService.AuthorizeUser(discordId, "auth-code");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(actual.AccessToken));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorType));
+            Mock.Get(bungieApiService).Verify(m => m.GetOAuthAccessToken(It.Is<OAuthRequest>(r => r.AuthCode == "auth-code")), Times.Once());
+            Mock.Get(bungieApiService).VerifyNoOtherCalls();
+            Mock.Get(emissaryDao).Verify(m => m.AddOrUpdateAccessToken(It.Is<BungieAccessToken>(r => r.DiscordId == discordId && r.AccessToken == "new-access-token" && r.RefreshToken == "refresh-token" && r.AccessTokenExpiresInSeconds == 3600 && r.RefreshTokenExpiresInSeconds == 7776000 && r.AccessTokenCreatedDate > currentTimeBeforeRequest && r.RefreshTokenCreatedDate > currentTimeBeforeRequest)), Times.Once());
+            Mock.Get(emissaryDao).VerifyNoOtherCalls();
         }
+
 
         [TestMethod]
-        public void AuthorizeUser_AuthCodeInvalid_ShouldSendRequestToBungieApiButThenReturnFalse()
+        public void AuthorizeUser_AuthCodeInvalid_ShouldSendRequestToBungieApiButThenReturnErrorAndNotUpdateDatabase()
         {
-            Assert.Fail();
+            IConfiguration config = Mock.Of<IConfiguration>();
+            IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+
+            OAuthResponse errorOAuthResponse = new OAuthResponse();
+            errorOAuthResponse.AccessToken = default;
+            errorOAuthResponse.RefreshToken = default;
+            errorOAuthResponse.AccessTokenExpiresInSeconds = default;
+            errorOAuthResponse.RefreshTokenExpiresInSeconds = default;
+            errorOAuthResponse.ErrorType = "server_error";
+            errorOAuthResponse.ErrorDescription = "Invalid length for a Base-64 char array or string.";
+
+            Mock.Get(bungieApiService).Setup(m => m.GetOAuthAccessToken(It.IsAny<OAuthRequest>())).Returns(errorOAuthResponse);
+
+            IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
+            OAuthResponse actual = authorizationService.AuthorizeUser(69, "bad-auth-code");
+
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.AccessToken));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(actual.ErrorType));
+            Mock.Get(bungieApiService).Verify(m => m.GetOAuthAccessToken(It.Is<OAuthRequest>(r => r.AuthCode == "bad-auth-code")), Times.Once());
+            Mock.Get(bungieApiService).VerifyNoOtherCalls();
+            Mock.Get(emissaryDao).VerifyNoOtherCalls();
         }
-
-        [TestMethod]
-        public void AuthorizeUser_UserIsNotRegistered_Should()
-        {
-            Assert.Fail();
-        }
-
-
-
-
 
 
     }

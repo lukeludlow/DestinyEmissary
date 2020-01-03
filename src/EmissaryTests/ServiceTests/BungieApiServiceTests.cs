@@ -19,7 +19,7 @@ namespace EmissaryTests.Service
         [TestMethod]
         public void GetOAuthAccessToken_ValidCode_ShouldReturnAccessTokenAndNullErrorMessage()
         {
-            IConfiguration config = Mock.Of<IConfiguration>(m => 
+            IConfiguration config = Mock.Of<IConfiguration>(m =>
                     m["Bungie:ApiKey"] == "dummy-api-key" &&
                     m["Bungie:ClientId"] == "dummy-client-id" &&
                     m["Bungie:ClientSecret"] == "dummy-client-secret");
@@ -55,13 +55,13 @@ namespace EmissaryTests.Service
             OAuthResponse actual = bungieApiService.GetOAuthAccessToken(request);
             // assert
             Assert.AreEqual(expectedAccessCode, actual.AccessToken);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorMessage));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorType) && string.IsNullOrWhiteSpace(actual.ErrorDescription));
         }
 
         [TestMethod]
         public void GetOAuthAccessToken_InvalidCode_ShouldReturnNullAccessTokenAndErrorMessage()
         {
-            IConfiguration config = Mock.Of<IConfiguration>(m => 
+            IConfiguration config = Mock.Of<IConfiguration>(m =>
                     m["Bungie:ApiKey"] == "dummy-api-key" &&
                     m["Bungie:ClientId"] == "dummy-client-id" &&
                     m["Bungie:ClientSecret"] == "dummy-client-secret");
@@ -97,7 +97,7 @@ namespace EmissaryTests.Service
             OAuthResponse actual = bungieApiService.GetOAuthAccessToken(request);
             // assert
             Assert.IsTrue(string.IsNullOrWhiteSpace(actual.AccessToken));
-            Assert.AreEqual("AuthorizationCodeInvalid", actual.ErrorMessage);
+            Assert.AreEqual("AuthorizationCodeInvalid", actual.ErrorDescription);
         }
 
         [TestMethod]
@@ -716,15 +716,16 @@ namespace EmissaryTests.Service
         [TestMethod]
         public void RefreshAccessToken_ValidRefreshToken_ShouldReturnNewAccessTokenAndSameRefreshTokenWithUpdatedExpireTime()
         {
-            IConfiguration config = Mock.Of<IConfiguration>(m => 
+            IConfiguration config = Mock.Of<IConfiguration>(m =>
                     m["Bungie:ApiKey"] == "dummy-api-key" &&
                     m["Bungie:ClientId"] == "dummy-client-id" &&
                     m["Bungie:ClientSecret"] == "dummy-client-secret");
-            // arrange
             Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
-            string refreshToken = "refresh.token";
+            string refreshToken = "refresh-token";
             string content = $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
-            string responseString = TestUtils.ReadFile("RefreshToken-valid.json");
+            string responseString = TestUtils.ReadFile("OAuth.Refresh-valid-refresh-token-success.json");
+            string expectedAccessToken = "CMfnARKGAgAgMgc7bAgu5A0xcQOHQONRWu9Mjq0O1/1zXz7R/kRg5hXgAAAADJt21jY58Cp3Mw/e6aSKOpqQ/jwpM5Yw8CrelL+zLyepdoi8CoZdEqmAoIVjPMezEzuNpL5tkSl13RoD6XvUP+zPRAl85OETHiTayetjNDqlNgu8UYAAt97lnh/db+TAlUuwZqpOmgUs/cAJmk6JS4piZvALo1KFstbWJIz1WmqQFMAT41dVi49P9PD5w+AJlqNR3lIfJs66UCwkgXH4EYWewBnzlplFLwxU56w3Q5Q8fQYc0Db9gUL+plPN4DNeAwPPtshgxNDhrfTsrH3R8TXq4ZcXLvJqYSucx2tjlmE=";
+            string expectedRefreshToken = "CMfnARKGAgAgM29n1MFKoiXR6F7Bo2TRKkuhhUD144lyxl4j697iupPgAAAAbQrA9ez/tfFeAIGNddkmZHv21ZqIn11UxQAHvzmqQmERczk8YLezxlJr76mWUYklbBjsmWZlqsSG9VfnaEy/sdc7E9oJg0f1muLmmA3vZvmetrfss12G7v6TczeT3W01upv4j6odQReOUDmJ+dxQb99hDgAoR1L4j6eL8FfdfDC3LFmQwrGJw/FJr/KvpjPQ9jncRsFt5v6UIl0usuCEy8rl/lETjXxVLYHX6Sr+ERwGOJYJVfFMcults6uWumr3S2ZVnHfG2gEHTlxyyQkkXOK1P4mQjdgRPWDgIR9fMy8=";
             Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mock
                 .Protected()
@@ -745,31 +746,52 @@ namespace EmissaryTests.Service
                 })
                 .Verifiable();
             HttpClient httpClient = new HttpClient(mock.Object);
+
             BungieApiService bungieApiService = new BungieApiService(config, httpClient);
-            string request = "refresh-token";
-            // act
-            OAuthResponse actual = bungieApiService.RefreshAccessToken(request);
-            // assert
-            Assert.AreEqual("new-access-token", actual.AccessToken);
-            Assert.AreEqual("refresh-token", actual.RefreshToken);
+            OAuthResponse actual = bungieApiService.RefreshAccessToken("refresh-token");
+
+            Assert.AreEqual(expectedAccessToken, actual.AccessToken);
+            Assert.AreEqual(expectedRefreshToken, actual.RefreshToken);
             Assert.AreEqual(3600, actual.AccessTokenExpiresInSeconds);
-            Assert.AreEqual(-1, actual.RefreshTokenExpiresInSeconds);
-            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorMessage));
+            Assert.AreEqual(7776000, actual.RefreshTokenExpiresInSeconds);
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorType));
         }
 
         [TestMethod]
-        public void RefreshAccessToken_ExpiredRefreshToken_ShouldReturnError()
+        public void RefreshAccessToken_ExpiredRefreshTokenOrMaybeBadRequest_ShouldReturnError()
         {
-            Assert.Fail();
+            IConfiguration config = Mock.Of<IConfiguration>(m =>
+                                m["Bungie:ApiKey"] == "dummy-api-key" &&
+                                m["Bungie:ClientId"] == "dummy-client-id" &&
+                                m["Bungie:ClientSecret"] == "dummy-client-secret");
+            Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
+            string refreshToken = "bad-refresh-token";
+            string content = $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
+            string responseString = TestUtils.ReadFile("OAuth.Refresh-error.json");
+            Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.BadRequest  ,
+                    Content = new StringContent(responseString)
+                })
+                .Verifiable();
+            HttpClient httpClient = new HttpClient(mock.Object);
+
+            OAuthResponse errorResponse = new OAuthResponse();
+            errorResponse.ErrorType = "server_error";
+            errorResponse.ErrorDescription = "Invalid length for a Base-64 char array or string.";
+
+            IBungieApiService bungieApiService = new BungieApiService(config, httpClient);
+            OAuthResponse actual = bungieApiService.RefreshAccessToken("bad-refresh-token");
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.AccessToken));
+            Assert.AreEqual("server_error", actual.ErrorType);
         }
-
-        // TODO idk should i do this?
-        // [TestMethod]
-        // public void RefreshAccessToken_BadRequest_ShouldReturnError()
-        // {
-        //     Assert.Fail();
-        // }
-
 
 
     }

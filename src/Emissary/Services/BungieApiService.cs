@@ -43,7 +43,20 @@ namespace EmissaryCore
 
         public OAuthResponse RefreshAccessToken(string refreshToken)
         {
-            throw new NotImplementedException();
+            HttpRequestMessage request = new HttpRequestMessage();
+            request.RequestUri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
+            request.Method = HttpMethod.Post;
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic.Add("grant_type", "refresh_token");
+            dic.Add("refresh_token", refreshToken);
+            dic.Add("client_id", config["Bungie:ClientId"]);
+            dic.Add("client_secret", config["Bungie:ClientSecret"]);
+            request.Content = new FormUrlEncodedContent(dic);
+            request.Content.Headers.Add("X-API-KEY", config["Bungie:ApiKey"]);
+            HttpResponseMessage response = httpClient.SendAsync(request).Result;
+            string json = response.Content.ReadAsStringAsync().Result;
+            OAuthResponse oauthResponse = JsonConvert.DeserializeObject<OAuthResponse>(json);
+            return oauthResponse;
         }
 
         public UserMembershipsResponse GetMembershipsForUser(UserMembershipsRequest membershipsRequest)

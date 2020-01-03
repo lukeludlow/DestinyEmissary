@@ -51,10 +51,25 @@ namespace EmissaryCore
             return currentTime >= expireTime;
         }
 
-        public bool AuthorizeUser(ulong discordId, string authCode)
+        public OAuthResponse AuthorizeUser(ulong discordId, string authCode)
         {
-            throw new NotImplementedException();
+            OAuthRequest oauthRequest = new OAuthRequest(authCode);
+            OAuthResponse oauthResponse = bungieApiService.GetOAuthAccessToken(oauthRequest);
+            if (string.IsNullOrWhiteSpace(oauthResponse.AccessToken)) {
+                return oauthResponse;
+            }
+            BungieAccessToken accessToken = new BungieAccessToken();
+            accessToken.DiscordId = discordId;
+            accessToken.AccessToken = oauthResponse.AccessToken;
+            accessToken.RefreshToken = oauthResponse.RefreshToken;
+            accessToken.AccessTokenExpiresInSeconds = oauthResponse.AccessTokenExpiresInSeconds;
+            accessToken.RefreshTokenExpiresInSeconds = oauthResponse.RefreshTokenExpiresInSeconds;
+            accessToken.AccessTokenCreatedDate = DateTimeOffset.UtcNow;
+            accessToken.RefreshTokenCreatedDate = DateTimeOffset.UtcNow;
+            emissaryDao.AddOrUpdateAccessToken(accessToken);
+            return oauthResponse;
         }
+
 
         // public OAuthResponse GetOAuthAccessToken(OAuthRequest oauthRequest)
         // {

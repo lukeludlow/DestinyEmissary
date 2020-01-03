@@ -241,23 +241,24 @@ namespace EmissaryCore
         {
             EmissaryUser existingUser = emissaryDao.GetUserByDiscordId(discordId);
             if (existingUser != null) {
-                OAuthRequest refreshOAuthRequest = new OAuthRequest(authCode);
-                OAuthResponse refreshOAuthResponse = bungieApiService.GetOAuthAccessToken(refreshOAuthRequest);
-                if (string.IsNullOrWhiteSpace(refreshOAuthResponse.AccessToken)) {
-                    return EmissaryResult.FromError(refreshOAuthResponse.ErrorMessage);
-                }
-                bool successfullyAuthorized = authorizationService.AuthorizeUser(discordId, authCode);
-                if (!successfullyAuthorized) {
-                    return EmissaryResult.FromError($"unable to authorize user (discordId: {discordId})");
+                // OAuthRequest refreshOAuthRequest = new OAuthRequest(authCode);
+                // OAuthResponse refreshOAuthResponse = bungieApiService.GetOAuthAccessToken(refreshOAuthRequest);
+                // if (string.IsNullOrWhiteSpace(refreshOAuthResponse.AccessToken)) {
+                //     return EmissaryResult.FromError($"api request failed. {refreshOAuthResponse.ErrorType} ({refreshOAuthResponse.ErrorDescription})");
+                // }
+                OAuthResponse refreshOAuthResponse = authorizationService.AuthorizeUser(discordId, authCode);
+                if (!string.IsNullOrWhiteSpace(refreshOAuthResponse.ErrorType)) {
+                    return EmissaryResult.FromError($"unable to authorize user (discordId {discordId}). {refreshOAuthResponse.ErrorType}: {refreshOAuthResponse.ErrorDescription}");
                 }
                 return EmissaryResult.FromSuccess("successfully authorized user");
             }
             EmissaryUser newUser = new EmissaryUser();
             newUser.DiscordId = discordId;
-            OAuthRequest oauthRequest = new OAuthRequest(authCode);
-            OAuthResponse oauthResponse = bungieApiService.GetOAuthAccessToken(oauthRequest);
+            OAuthResponse oauthResponse = authorizationService.AuthorizeUser(discordId, authCode);
+            // OAuthRequest oauthRequest = new OAuthRequest(authCode);
+            // OAuthResponse oauthResponse = bungieApiService.GetOAuthAccessToken(oauthRequest);
             if (string.IsNullOrWhiteSpace(oauthResponse.AccessToken)) {
-                return EmissaryResult.FromError(oauthResponse.ErrorMessage);
+                return EmissaryResult.FromError($"api request failed. {oauthResponse.ErrorType} ({oauthResponse.ErrorDescription})");
             }
             BungieAccessToken newUsersAccessToken = new BungieAccessToken(discordId, oauthResponse.AccessToken, oauthResponse.RefreshToken, oauthResponse.AccessTokenExpiresInSeconds, oauthResponse.RefreshTokenExpiresInSeconds, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
             emissaryDao.AddOrUpdateAccessToken(newUsersAccessToken);

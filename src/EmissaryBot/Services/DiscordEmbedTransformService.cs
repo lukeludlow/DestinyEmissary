@@ -29,7 +29,7 @@ namespace EmissaryCore
                     eb.WithTitle($"{context.User.Username}'s currently equipped loadout");
                     eb.AddField("___", LoadoutToDescription(JsonConvert.DeserializeObject<Loadout>(result.Message)));
                     break;
-                case "save":
+                case "saveas":
                     eb.WithTitle($"successfully saved loadout");
                     eb.AddField("___", LoadoutToDescription(JsonConvert.DeserializeObject<Loadout>(result.Message)));
                     break;

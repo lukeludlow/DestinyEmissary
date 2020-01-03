@@ -21,7 +21,9 @@ namespace EmissaryCore
         public int RefreshTokenExpiresInSeconds { get; set; }
 
         // this will only exist if the request fails and a 400 response is sent with the error description in the body
+        [JsonProperty("error")]
+        public string ErrorType { get; set; }
         [JsonProperty("error_description")]
-        public string ErrorMessage { get; set; }
+        public string ErrorDescription { get; set; }
     }
 }
