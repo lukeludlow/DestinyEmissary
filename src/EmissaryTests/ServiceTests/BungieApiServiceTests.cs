@@ -713,7 +713,62 @@ namespace EmissaryTests.Service
         }
 
 
+        [TestMethod]
+        public void RefreshAccessToken_ValidRefreshToken_ShouldReturnNewAccessTokenAndSameRefreshTokenWithUpdatedExpireTime()
+        {
+            IConfiguration config = Mock.Of<IConfiguration>(m => 
+                    m["Bungie:ApiKey"] == "dummy-api-key" &&
+                    m["Bungie:ClientId"] == "dummy-client-id" &&
+                    m["Bungie:ClientSecret"] == "dummy-client-secret");
+            // arrange
+            Uri uri = new Uri("https://www.bungie.net/Platform/App/OAuth/Token/");
+            string refreshToken = "refresh.token";
+            string content = $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={"dummy-client-id"}&client_secret={"dummy-client-secret"}";
+            string responseString = TestUtils.ReadFile("RefreshToken-valid.json");
+            Mock<HttpMessageHandler> mock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mock
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(
+                        req =>
+                        req.Method == HttpMethod.Post
+                        && req.RequestUri == uri
+                        && req.Content.Headers.Any(h => h.Key == "X-API-KEY" && !string.IsNullOrEmpty(h.Value.FirstOrDefault()))
+                        && req.Content.Headers.Any(h => h.Key == "Content-Type" && h.Value.FirstOrDefault() == "application/x-www-form-urlencoded")
+                        && req.Content.ReadAsStringAsync().Result == content),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(responseString)
+                })
+                .Verifiable();
+            HttpClient httpClient = new HttpClient(mock.Object);
+            BungieApiService bungieApiService = new BungieApiService(config, httpClient);
+            string request = "refresh-token";
+            // act
+            OAuthResponse actual = bungieApiService.RefreshAccessToken(request);
+            // assert
+            Assert.AreEqual("new-access-token", actual.AccessToken);
+            Assert.AreEqual("refresh-token", actual.RefreshToken);
+            Assert.AreEqual(3600, actual.AccessTokenExpiresInSeconds);
+            Assert.AreEqual(-1, actual.RefreshTokenExpiresInSeconds);
+            Assert.IsTrue(string.IsNullOrWhiteSpace(actual.ErrorMessage));
+        }
 
+        [TestMethod]
+        public void RefreshAccessToken_ExpiredRefreshToken_ShouldReturnError()
+        {
+            Assert.Fail();
+        }
+
+        // TODO idk should i do this?
+        // [TestMethod]
+        // public void RefreshAccessToken_BadRequest_ShouldReturnError()
+        // {
+        //     Assert.Fail();
+        // }
 
 
 

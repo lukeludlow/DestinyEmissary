@@ -41,6 +41,11 @@ namespace EmissaryCore
             return oauthResponse;
         }
 
+        public OAuthResponse RefreshAccessToken(string refreshToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public UserMembershipsResponse GetMembershipsForUser(UserMembershipsRequest membershipsRequest)
         {
             HttpRequestMessage request = new HttpRequestMessage();

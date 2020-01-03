@@ -41,6 +41,8 @@ namespace EmissaryCore
             }
         }
 
+
+
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -58,6 +60,5 @@ namespace EmissaryCore
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
     }
 }

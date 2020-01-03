@@ -5,13 +5,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmissaryCore
 {
-    public class LoadoutDao : ILoadoutDao, IDisposable
+    public class EmissaryDao : IEmissaryDao, IDisposable
     {
         private EmissaryDbContext dbContext;
 
-        public LoadoutDao(EmissaryDbContext context)
+        public EmissaryDao(EmissaryDbContext context)
         {
             this.dbContext = context;
+        }
+
+        public EmissaryUser GetUserByDiscordId(ulong discordId)
+        {
+            return dbContext.Users.Find(discordId);
+        }
+
+        public void AddOrUpdateUser(EmissaryUser user)
+        {
+            EmissaryUser existingUser = dbContext.Users.Where(u => u.DiscordId == user.DiscordId).FirstOrDefault();
+            if (existingUser == null) {
+                dbContext.Users.Add(user);
+            } else {
+                dbContext.Entry(existingUser).CurrentValues.SetValues(user);
+            }
+            dbContext.SaveChanges();
+        }
+
+        public void RemoveUser(ulong discordId)
+        {
+            EmissaryUser user = dbContext.Users.Find(discordId);
+            if (user != null) {
+                dbContext.Users.Remove(user);
+                dbContext.SaveChanges();
+            }
         }
 
         public IList<Loadout> GetAllLoadoutsForUser(ulong discordId)
@@ -46,7 +71,21 @@ namespace EmissaryCore
             }
         }
 
+        public void AddOrUpdateAccessToken(BungieAccessToken accessToken)
+        {
+            BungieAccessToken existingToken = dbContext.AccessTokens.Where(token => token.DiscordId == accessToken.DiscordId).FirstOrDefault();
+            if (existingToken == null) {
+                dbContext.AccessTokens.Add(accessToken);
+            } else {
+                dbContext.Entry(existingToken).CurrentValues.SetValues(accessToken);
+            }
+            dbContext.SaveChanges();
+        }
 
+        public BungieAccessToken GetAccessTokenByDiscordId(ulong discordId)
+        {
+            return dbContext.AccessTokens.Find(discordId);
+        }
 
         private bool disposed = false;
 

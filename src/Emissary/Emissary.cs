@@ -20,20 +20,20 @@ namespace EmissaryCore
         private readonly IBungieApiService bungieApiService;
         private readonly IManifestDao manifestDao;
         private readonly EmissaryDbContext dbContext;
-        private readonly IUserDao userDao;
-        private readonly ILoadoutDao loadoutDao;
+        private readonly IEmissaryDao emissaryDao;
+        private readonly IAuthorizationService authorizationService;
 
         public event Action<ulong> RequestAuthorizationEvent;
 
 
-        public Emissary(IConfiguration config, IBungieApiService bungieApiService, IManifestDao manifestDao, EmissaryDbContext dbContext, IUserDao userDao, ILoadoutDao loadoutDao)
+        public Emissary(IConfiguration config, IBungieApiService bungieApiService, IManifestDao manifestDao, EmissaryDbContext dbContext, IEmissaryDao emissaryDao, IAuthorizationService authorizationService)
         {
             this.config = config;
             this.bungieApiService = bungieApiService;
             this.manifestDao = manifestDao;
             this.dbContext = dbContext;
-            this.userDao = userDao;
-            this.loadoutDao = loadoutDao;
+            this.emissaryDao = emissaryDao;
+            this.authorizationService = authorizationService;
         }
 
         public static Emissary Startup(IConfiguration config)
@@ -47,14 +47,14 @@ namespace EmissaryCore
                 .Options;
             EmissaryDbContext dbContext = new EmissaryDbContext(dbContextOptions);
             dbContext.Database.EnsureCreated();
-            IUserDao userDao = new UserDao(dbContext);
-            ILoadoutDao loadoutDao = new LoadoutDao(dbContext);
-            return new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissaryDao emissaryDao = new EmissaryDao(dbContext);
+            IAuthorizationService authorizationService = new AuthorizationService(config, bungieApiService, emissaryDao);
+            return new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
         }
 
         public EmissaryResult CurrentlyEquipped(ulong discordId)
         {
-            EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            EmissaryUser user = emissaryDao.GetUserByDiscordId(discordId);
             if (user == null) {
                 RequestAuthorizationEvent?.Invoke(discordId);
                 return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
@@ -70,7 +70,7 @@ namespace EmissaryCore
                     .Select(genericItem => CreateDestinyItemFromGenericItem(genericItem))
                     .Where(item => ItemIsWeaponOrArmor(item))
                     .ToList();
-            IList<Loadout> savedLoadouts = loadoutDao.GetAllLoadoutsForUser(discordId);
+            IList<Loadout> savedLoadouts = emissaryDao.GetAllLoadoutsForUser(discordId);
             if (savedLoadouts != null && savedLoadouts.Count > 0) {
                 foreach (Loadout savedLoadout in savedLoadouts) {
                     bool loadoutsAreEqual = currentlyEquipped.DestinyCharacterId == savedLoadout.DestinyCharacterId
@@ -108,26 +108,26 @@ namespace EmissaryCore
 
         public EmissaryResult ListLoadouts(ulong discordId)
         {
-            EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            EmissaryUser user = emissaryDao.GetUserByDiscordId(discordId);
             if (user == null) {
                 RequestAuthorizationEvent?.Invoke(discordId);
                 return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
-            IList<Loadout> loadouts = loadoutDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
+            IList<Loadout> loadouts = emissaryDao.GetAllLoadoutsForUser(discordId).Where(l => l.DestinyCharacterId == destinyCharacterId).ToList();
             return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadouts));
         }
 
         public EmissaryResult EquipLoadout(ulong discordId, string loadoutName)
         {
-            EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            EmissaryUser user = emissaryDao.GetUserByDiscordId(discordId);
             if (user == null) {
                 RequestAuthorizationEvent?.Invoke(discordId);
                 return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             loadoutName = loadoutName.Trim();
-            Loadout loadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
+            Loadout loadout = emissaryDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
 
             IList<DestinyItem> itemsToEquip = loadout.Items;
             foreach (DestinyItem item in itemsToEquip.ToList()) {
@@ -138,7 +138,12 @@ namespace EmissaryCore
             }
             IList<long> itemInstanceIds = itemsToEquip.Select(item => item.ItemInstanceId).ToList();
 
-            EquipItemsRequest equipRequest = new EquipItemsRequest(user.BungieAccessToken, user.DestinyMembershipType, destinyCharacterId, itemInstanceIds);
+            string bungieAccessToken = authorizationService.GetAccessToken(discordId);
+            if (bungieAccessToken == null) {
+                RequestAuthorizationEvent?.Invoke(discordId);
+                return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
+            }
+            EquipItemsRequest equipRequest = new EquipItemsRequest(bungieAccessToken, user.DestinyMembershipType, destinyCharacterId, itemInstanceIds);
 
             EquipItemsResponse equipResponse;
             try {
@@ -190,7 +195,11 @@ namespace EmissaryCore
         // TODO finalize and test this
         public EmissaryResult SaveCurrentlyEquippedAsLoadout(ulong discordId, string loadoutName)
         {
-            Loadout loadoutToSave = JsonConvert.DeserializeObject<Loadout>(CurrentlyEquipped(discordId).Message);
+            EmissaryResult currentlyEquippedResult = CurrentlyEquipped(discordId);
+            if (!currentlyEquippedResult.Success) {
+                return currentlyEquippedResult;
+            }
+            Loadout loadoutToSave = JsonConvert.DeserializeObject<Loadout>(currentlyEquippedResult.Message);
             return SaveLoadout(discordId, loadoutToSave, loadoutName);
         }
 
@@ -201,10 +210,10 @@ namespace EmissaryCore
             loadout.LoadoutName = loadoutName;
             try {
                 int maxLoadoutLimit = 25;
-                if (loadoutDao.GetAllLoadoutsForUser(discordId).Count >= maxLoadoutLimit) {
+                if (emissaryDao.GetAllLoadoutsForUser(discordId).Count >= maxLoadoutLimit) {
                     return EmissaryResult.FromError($"you've reached the max loadout limit ({maxLoadoutLimit}). please delete or overwrite an existing loadouts in order to save this loadout");
                 }
-                loadoutDao.AddOrUpdateLoadout(loadout);
+                emissaryDao.AddOrUpdateLoadout(loadout);
                 return EmissaryResult.FromSuccess(JsonConvert.SerializeObject(loadout));
             } catch (Exception e) {
                 return EmissaryResult.FromError(e.Message);
@@ -213,33 +222,35 @@ namespace EmissaryCore
 
         public EmissaryResult DeleteLoadout(ulong discordId, string loadoutName)
         {
-            EmissaryUser user = userDao.GetUserByDiscordId(discordId);
+            EmissaryUser user = emissaryDao.GetUserByDiscordId(discordId);
             if (user == null) {
                 RequestAuthorizationEvent?.Invoke(discordId);
                 return EmissaryResult.FromError("i need access to your bungie account to do this. please check your DMs for instructions");
             }
             long destinyCharacterId = GetMostRecentlyPlayedCharacterId(user.DestinyMembershipType, user.DestinyProfileId);
             loadoutName = loadoutName.Trim();
-            Loadout foundLoadout = loadoutDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
+            Loadout foundLoadout = emissaryDao.GetLoadout(discordId, destinyCharacterId, loadoutName);
             if (foundLoadout == null) {
                 return EmissaryResult.FromError($"loadout not found. use `$list` to view all of your saved loadouts");
             }
-            loadoutDao.RemoveLoadout(discordId, destinyCharacterId, loadoutName);
+            emissaryDao.RemoveLoadout(discordId, destinyCharacterId, loadoutName);
             return EmissaryResult.FromSuccess($"successfully deleted loadout \"{loadoutName}\"");
         }
 
         public EmissaryResult RegisterOrReauthorize(ulong discordId, string authCode)
         {
-            EmissaryUser existingUser = userDao.GetUserByDiscordId(discordId);
+            EmissaryUser existingUser = emissaryDao.GetUserByDiscordId(discordId);
             if (existingUser != null) {
                 OAuthRequest refreshOAuthRequest = new OAuthRequest(authCode);
                 OAuthResponse refreshOAuthResponse = bungieApiService.GetOAuthAccessToken(refreshOAuthRequest);
                 if (string.IsNullOrWhiteSpace(refreshOAuthResponse.AccessToken)) {
                     return EmissaryResult.FromError(refreshOAuthResponse.ErrorMessage);
                 }
-                existingUser.BungieAccessToken = refreshOAuthResponse.AccessToken;
-                userDao.AddOrUpdateUser(existingUser);
-                return EmissaryResult.FromSuccess("successfully reauthorized user");
+                bool successfullyAuthorized = authorizationService.AuthorizeUser(discordId, authCode);
+                if (!successfullyAuthorized) {
+                    return EmissaryResult.FromError($"unable to authorize user (discordId: {discordId})");
+                }
+                return EmissaryResult.FromSuccess("successfully authorized user");
             }
             EmissaryUser newUser = new EmissaryUser();
             newUser.DiscordId = discordId;
@@ -248,8 +259,9 @@ namespace EmissaryCore
             if (string.IsNullOrWhiteSpace(oauthResponse.AccessToken)) {
                 return EmissaryResult.FromError(oauthResponse.ErrorMessage);
             }
-            newUser.BungieAccessToken = oauthResponse.AccessToken;
-            UserMembershipsRequest membershipsRequest = new UserMembershipsRequest(oauthResponse.AccessToken);
+            BungieAccessToken newUsersAccessToken = new BungieAccessToken(discordId, oauthResponse.AccessToken, oauthResponse.RefreshToken, oauthResponse.AccessTokenExpiresInSeconds, oauthResponse.RefreshTokenExpiresInSeconds, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+            emissaryDao.AddOrUpdateAccessToken(newUsersAccessToken);
+            UserMembershipsRequest membershipsRequest = new UserMembershipsRequest(newUsersAccessToken.AccessToken);
             UserMembershipsResponse membershipsResponse = bungieApiService.GetMembershipsForUser(membershipsRequest);
 
             DestinyMembership mainMembership = membershipsResponse.DestinyMemberships[0];
@@ -260,7 +272,7 @@ namespace EmissaryCore
             newUser.DestinyMembershipType = mainMembership.MembershipType;
             newUser.DestinyProfileId = mainMembership.DestinyProfileId;
 
-            userDao.AddOrUpdateUser(newUser);
+            emissaryDao.AddOrUpdateUser(newUser);
             return EmissaryResult.FromSuccess("");
         }
 

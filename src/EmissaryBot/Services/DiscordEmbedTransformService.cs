@@ -39,7 +39,7 @@ namespace EmissaryCore
                     break;
                 default:
                     eb.WithTitle($"success");
-                    eb.WithDescription("");
+                    eb.WithDescription(result.Message);
                     break;
             }
             return eb.Build();

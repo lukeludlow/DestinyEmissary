@@ -9,6 +9,7 @@ namespace EmissaryCore
     {
         public DbSet<EmissaryUser> Users { get; set; }
         public DbSet<Loadout> Loadouts { get; set; }
+        public DbSet<BungieAccessToken> AccessTokens { get; set; }
 
         public EmissaryDbContext()
         {
@@ -47,7 +48,8 @@ namespace EmissaryCore
             // i.e. prod is ./src/data/emissary.db, dev is ../../../src/data/emissary.db
             if (!optionsBuilder.IsConfigured) {
                 // "DataSource={databasePath}  e.g. full path of src/data/user-info.db
-                optionsBuilder.UseSqlite("idk");
+                // optionsBuilder.UseSqlite("idk");
+                throw new NotImplementedException();
             }
         }
     }

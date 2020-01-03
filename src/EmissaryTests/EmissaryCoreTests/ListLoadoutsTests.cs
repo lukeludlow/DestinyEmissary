@@ -24,15 +24,15 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             long titanCharacterId = 2305843009504575107;
             uint izanagiHash = 3211806999;
@@ -49,11 +49,11 @@ namespace EmissaryTests.Core
 
             IList<Loadout> allLoadoutsForUser = new List<Loadout>() { titanLoadout };
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
-            Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(emissaryDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(allLoadoutsForUser), result.Message);
@@ -65,15 +65,15 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             long titanCharacterId = 2305843009504575107;
             uint izanagiHash = 3211806999;
@@ -102,11 +102,11 @@ namespace EmissaryTests.Core
             DestinyCharacter titan = new DestinyCharacter(titanCharacterId, DateTimeOffset.Parse("2019-12-24T22:40:31Z"), destinyProfileId, BungieMembershipType.Steam);
             charactersResponse.Characters.Add(titan.CharacterId, titan);
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
-            Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(emissaryDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(titanLoadouts), result.Message);
@@ -118,15 +118,16 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 69;
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(value: null);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(value: null);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.ListLoadouts(discordId);
 
             Assert.IsFalse(result.Success);
@@ -139,15 +140,15 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             IList<Loadout> allLoadoutsForUser = new List<Loadout>() { };
 
@@ -157,11 +158,11 @@ namespace EmissaryTests.Core
             DestinyCharacter titan = new DestinyCharacter(titanCharacterId, DateTimeOffset.Parse("2019-12-24T22:40:31Z"), destinyProfileId, BungieMembershipType.Steam);
             charactersResponse.Characters.Add(titan.CharacterId, titan);
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
-            Mock.Get(loadoutDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(emissaryDao).Setup(m => m.GetAllLoadoutsForUser(discordId)).Returns(allLoadoutsForUser);
             Mock.Get(bungieApiService).Setup(m => m.GetProfileCharacters(It.IsAny<ProfileCharactersRequest>())).Returns(charactersResponse);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.ListLoadouts(discordId);
             Assert.IsTrue(result.Success);
             Assert.AreEqual(JsonConvert.SerializeObject(allLoadoutsForUser), result.Message);

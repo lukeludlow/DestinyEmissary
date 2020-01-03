@@ -8,14 +8,12 @@ namespace EmissaryCore
         public ulong DiscordId { get; set; }
         public long DestinyProfileId { get; set; }
         public int DestinyMembershipType { get; set; }
-        public string BungieAccessToken { get; set; }
 
-        public EmissaryUser(ulong discordId, long destinyProfileId, int destinyMembershipType, string bungieAccessToken)
+        public EmissaryUser(ulong discordId, long destinyProfileId, int destinyMembershipType)
         {
             this.DiscordId = discordId;
             this.DestinyProfileId = destinyProfileId;
             this.DestinyMembershipType = destinyMembershipType;
-            this.BungieAccessToken = bungieAccessToken;
         }
 
         public EmissaryUser()

@@ -24,20 +24,20 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser expectedUser = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser expectedUser = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             string authCode = "auth-code";
 
             OAuthResponse authResponse = new OAuthResponse();
-            authResponse.AccessToken = accessToken;
+            authResponse.AccessToken = "access-token";
 
             Mock.Get(bungieApiService)
                 .Setup(m =>
@@ -52,23 +52,22 @@ namespace EmissaryTests.Core
             Mock.Get(bungieApiService)
                 .Setup(m =>
                     m.GetMembershipsForUser(It.Is<UserMembershipsRequest>(r =>
-                        r.AccessToken == accessToken)))
+                        r.AccessToken == "access-token")))
                 .Returns(membershipsResponse);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
             Assert.IsTrue(result.Success);
 
             Mock.Get(bungieApiService).Verify(m => m.GetOAuthAccessToken(It.IsAny<OAuthRequest>()), Times.Once());
             Mock.Get(bungieApiService).Verify(m => m.GetMembershipsForUser(It.IsAny<UserMembershipsRequest>()), Times.Once());
 
-            Mock.Get(userDao)
+            Mock.Get(emissaryDao)
                 .Verify(m =>
                     m.AddOrUpdateUser(It.Is<EmissaryUser>(u =>
                         u.DiscordId == discordId &&
                         u.DestinyProfileId == destinyProfileId &&
-                        u.DestinyMembershipType == destinyMembershipType &&
-                        u.BungieAccessToken == accessToken)), Times.Once());
+                        u.DestinyMembershipType == destinyMembershipType)), Times.Once());
         }
 
         [TestMethod]
@@ -77,17 +76,18 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             string expiredAccessToken = "expired-access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, expiredAccessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
 
             string authCode = "auth-code";
 
@@ -101,19 +101,23 @@ namespace EmissaryTests.Core
                         r.AuthCode == authCode)))
                 .Returns(oauthResponse);
 
+                Mock.Get(authorizationService).Setup(m => m.AuthorizeUser(discordId, authCode)).Returns(true);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
 
             Assert.IsTrue(result.Success);
-            Assert.IsTrue(result.Message.ToLower().Contains("reauthorized"));
+            Assert.IsTrue(result.Message.ToLower().Contains("authorized"));
 
-            Mock.Get(userDao).Verify(m => m.GetUserByDiscordId(discordId), Times.Once());
+            Mock.Get(authorizationService).Verify(m => m.AuthorizeUser(discordId, authCode), Times.Once());
 
-            Mock.Get(userDao).Verify(m =>
+            Mock.Get(emissaryDao).Verify(m => m.GetUserByDiscordId(discordId), Times.Once());
+
+            Mock.Get(emissaryDao).Verify(m =>
                 m.AddOrUpdateUser(It.Is<EmissaryUser>(r =>
-                    r.DiscordId == discordId &&
-                    r.BungieAccessToken == newAccessToken)), Times.Once());
+                    r.DiscordId == discordId)), Times.Never());
+            
+            // Mock.Get(emissaryDao).Verify(m => m.AddOrUpdateAccessToken(It.Is<BungieAccessToken>(r => r.AccessToken == "new-access-token")), Times.Once());
         }
 
         [TestMethod]
@@ -122,17 +126,17 @@ namespace EmissaryTests.Core
             IConfiguration config = Mock.Of<IConfiguration>();
             IBungieApiService bungieApiService = Mock.Of<IBungieApiService>();
             IManifestDao manifestDao = Mock.Of<IManifestDao>();
-            IUserDao userDao = Mock.Of<IUserDao>();
-            ILoadoutDao loadoutDao = Mock.Of<ILoadoutDao>();
             EmissaryDbContext dbContext = Mock.Of<EmissaryDbContext>();
+            IEmissaryDao emissaryDao = Mock.Of<IEmissaryDao>();
+            IAuthorizationService authorizationService = Mock.Of<IAuthorizationService>();
+
 
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
-            Mock.Get(userDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
+            Mock.Get(emissaryDao).Setup(m => m.GetUserByDiscordId(discordId)).Returns(user);
 
             string authCode = "auth-code";
 
@@ -146,7 +150,7 @@ namespace EmissaryTests.Core
                         r.AuthCode == authCode)))
                 .Returns(authResponse);
 
-            Emissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, userDao, loadoutDao);
+            IEmissary emissary = new Emissary(config, bungieApiService, manifestDao, dbContext, emissaryDao, authorizationService);
             EmissaryResult result = emissary.RegisterOrReauthorize(discordId, authCode);
             Assert.IsFalse(result.Success);
             Assert.IsTrue(result.ErrorMessage.Contains("AuthorizationCodeInvalid"));
@@ -154,9 +158,9 @@ namespace EmissaryTests.Core
             Mock.Get(bungieApiService).Verify(m => m.GetOAuthAccessToken(It.IsAny<OAuthRequest>()), Times.Once());
             Mock.Get(bungieApiService).VerifyNoOtherCalls();
 
-            Mock.Get(userDao).Verify(m => m.GetUserByDiscordId(discordId), Times.Once());
+            Mock.Get(emissaryDao).Verify(m => m.GetUserByDiscordId(discordId), Times.Once());
             // it should not try to update the user in the database
-            Mock.Get(userDao).VerifyNoOtherCalls();
+            Mock.Get(emissaryDao).VerifyNoOtherCalls();
         }
 
 

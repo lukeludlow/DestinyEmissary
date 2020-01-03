@@ -1,4 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EmissaryCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
 
 namespace EmissaryTests
 {
@@ -12,6 +15,13 @@ namespace EmissaryTests
 
         // random side note. if i run the tests in iterm and then can't see what i'm typing, 
         // then enter the command `stty sane`
+
+        [TestMethod]
+        public void Startup_WithConfig_ShouldReturnNewEmissaryInstance()
+        {
+            IConfiguration config = Mock.Of<IConfiguration>();
+            Emissary actual = Emissary.Startup(config);
+        }
 
     }
 }

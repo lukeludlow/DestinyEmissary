@@ -20,7 +20,7 @@ namespace EmissaryTests.Dao
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -43,7 +43,6 @@ namespace EmissaryTests.Dao
                     Assert.AreEqual(discordId, foundUser.DiscordId);
                     Assert.AreEqual(destinyProfileId, foundUser.DestinyProfileId);
                     Assert.AreEqual(destinyMembershipType, foundUser.DestinyMembershipType);
-                    Assert.AreEqual(accessToken, foundUser.BungieAccessToken);
                 }
             }
         }
@@ -55,7 +54,7 @@ namespace EmissaryTests.Dao
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -73,11 +72,9 @@ namespace EmissaryTests.Dao
                     Assert.AreEqual(discordId, foundUser.DiscordId);
                     Assert.AreEqual(destinyProfileId, foundUser.DestinyProfileId);
                     Assert.AreEqual(destinyMembershipType, foundUser.DestinyMembershipType);
-                    Assert.AreEqual(accessToken, foundUser.BungieAccessToken);
 
                     UserDao userDao = new UserDao(dbContext);
                     user.DestinyProfileId = 69;
-                    user.BungieAccessToken = "new-token";
                     userDao.AddOrUpdateUser(user);
                 }
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
@@ -86,7 +83,6 @@ namespace EmissaryTests.Dao
                     Assert.AreEqual(discordId, foundUser.DiscordId);
                     Assert.AreEqual((long)69, foundUser.DestinyProfileId);
                     Assert.AreEqual(destinyMembershipType, foundUser.DestinyMembershipType);
-                    Assert.AreEqual("new-token", foundUser.BungieAccessToken);
                 }
             }
         }
@@ -98,8 +94,8 @@ namespace EmissaryTests.Dao
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
-            EmissaryUser user2 = new EmissaryUser(69, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
+            EmissaryUser user2 = new EmissaryUser(69, destinyProfileId, destinyMembershipType);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -130,9 +126,9 @@ namespace EmissaryTests.Dao
         [TestMethod]
         public void GetUserByDiscordId_UserDoesExistAndThereAreLotsOfOtherUsersToo_ShouldReturnUser()
         {
-            EmissaryUser user1 = new EmissaryUser(69, 69, 3, "access-token");
-            EmissaryUser user2 = new EmissaryUser(420, 69, 3, "access-token");
-            EmissaryUser user3 = new EmissaryUser(42069, 69, 3, "access-token");
+            EmissaryUser user1 = new EmissaryUser(69, 69, 3);
+            EmissaryUser user2 = new EmissaryUser(420, 69, 3);
+            EmissaryUser user3 = new EmissaryUser(42069, 69, 3);
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
                 DbContextOptions<EmissaryDbContext> options = new DbContextOptionsBuilder<EmissaryDbContext>()
@@ -161,7 +157,7 @@ namespace EmissaryTests.Dao
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
             string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -193,7 +189,7 @@ namespace EmissaryTests.Dao
         public void GetUserByDiscordId_UserHasKeyButAllValuesAreDefaultOrNull_ShouldStillReturnUser()
         {
             ulong discordId = 221313820847636491;
-            EmissaryUser user = new EmissaryUser(discordId, default, default, null);
+            EmissaryUser user = new EmissaryUser(discordId, default, default);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -211,7 +207,6 @@ namespace EmissaryTests.Dao
                     Assert.AreEqual(discordId, foundUser.DiscordId);
                     Assert.AreEqual(0, foundUser.DestinyProfileId);
                     Assert.AreEqual(0, foundUser.DestinyMembershipType);
-                    Assert.AreEqual(null, foundUser.BungieAccessToken);
                 }
             }
         }
@@ -243,10 +238,9 @@ namespace EmissaryTests.Dao
             ulong discordId = 221313820847636491;
             long destinyProfileId = 4611686018467260757;
             int destinyMembershipType = BungieMembershipType.Steam;
-            string accessToken = "access-token";
-            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType, accessToken);
-            EmissaryUser user2 = new EmissaryUser(69, destinyProfileId, destinyMembershipType, accessToken);
-            EmissaryUser user3 = new EmissaryUser(420, destinyProfileId, destinyMembershipType, accessToken);
+            EmissaryUser user = new EmissaryUser(discordId, destinyProfileId, destinyMembershipType);
+            EmissaryUser user2 = new EmissaryUser(69, destinyProfileId, destinyMembershipType);
+            EmissaryUser user3 = new EmissaryUser(420, destinyProfileId, destinyMembershipType);
 
             using (SqliteConnection connection = new SqliteConnection("DataSource=:memory:")) {
                 connection.Open();
@@ -283,7 +277,7 @@ namespace EmissaryTests.Dao
                 }
                 using (EmissaryDbContext dbContext = new EmissaryDbContext(options)) {
                     using (UserDao userDao = new UserDao(dbContext)) {
-                        userDao.AddOrUpdateUser(new EmissaryUser(69, 420, 3, ""));
+                        userDao.AddOrUpdateUser(new EmissaryUser(69, 420, 3));
                     }
                     // this is a kinda useful test but i'm mainly doing it for code coverage
                     using (UserDao userDao = new UserDao(dbContext)) {
