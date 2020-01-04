@@ -53,12 +53,12 @@ namespace EmissaryBot
                     return;
                 }
                 LogRequestInfo(context.Request);
-
-                // GET https://www.bungie.net/en/oauth/authorize?client_id=30910&response_type=code&state=221313820847636491
-
+                // ignore internet mass scan request
+                if (string.IsNullOrWhiteSpace(context.Request.QueryString["code"]) || string.IsNullOrWhiteSpace(context.Request.QueryString["state"])) {
+                    return;
+                }
                 await log.LogAsync(new LogMessage(LogSeverity.Info, "HttpListenerService", "passing authorization code to emissary auth service"));
                 await emissaryService.RegisterOrReauthorize(context.Request.QueryString["state"], context.Request.QueryString["code"]);
-
                 WriteResponse(context.Response);
             }
         }
